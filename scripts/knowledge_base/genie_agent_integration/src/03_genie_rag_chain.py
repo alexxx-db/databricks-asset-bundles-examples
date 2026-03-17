@@ -58,7 +58,7 @@ mlflow.langchain.autolog()
 
 dbutils.widgets.text("genie_space_id", "YOUR_SPACE_ID_HERE")
 dbutils.widgets.text("llm_endpoint",   "databricks-meta-llama-3-3-70b-instruct")
-dbutils.widgets.text("secret_scope",   "echostar-genie")
+dbutils.widgets.text("secret_scope",   "my-genie")
 dbutils.widgets.text("secret_key",     "api_token")
 
 GENIE_SPACE_ID = dbutils.widgets.get("genie_space_id")
@@ -78,7 +78,7 @@ chain_config = {
     "llm_config": {
         "llm_parameters": {"max_tokens": 1500, "temperature": 0.01},
         "synthesis_prompt": (
-            "You are a trusted data analyst assistant for EchoStar. "
+            "You are a trusted data analyst assistant. "
             "Use only the information provided to answer the question. "
             "If the data is tabular, summarize key insights. "
             "Always cite specific numbers from the data. "

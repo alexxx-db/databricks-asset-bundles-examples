@@ -48,7 +48,7 @@ databricks bundle run set_genie_permissions \
 
 # 5. After SMEs edit the space in the UI, sync back to git (with PR):
 databricks bundle run sync_genie_space \
-  -p space_name=echostar_finops \
+  -p space_name=finops_example \
   -p create_review=true
 ```
 
@@ -64,7 +64,7 @@ genie_space_full/
 │   ├── sync_genie_space.py           # Read live state → commit to GitHub/GitLab
 │   └── set_genie_permissions.py      # PATCH /api/2.0/permissions/genie/{id}
 ├── genie_spaces/
-│   └── echostar_finops.json          # Serialized space definition (EchoStar FinOps)
+│   └── finops_example.json          # Serialized space definition (FinOps example)
 └── app/
     ├── app.py                        # Streamlit QA Reviewer
     ├── app.yml                       # App entrypoint config
@@ -82,7 +82,7 @@ Valid `permission_level` values: `CAN_READ`, `CAN_RUN`, `CAN_EDIT`, `CAN_MANAGE`
 
 ## Space JSON format
 
-`genie_spaces/echostar_finops.json` is the EchoStar-themed example covering:
+`genie_spaces/finops_example.json` is the example example covering:
 - FinOps DBU usage (`workspace_dbu_daily`)
 - Pipeline run costs (`pipeline_runs`)
 - SQL warehouse usage (`sql_warehouse_usage`)

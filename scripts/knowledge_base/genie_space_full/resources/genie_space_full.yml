@@ -6,7 +6,7 @@ resources:
     deploy_genie_space:
       name: "genie-space-full-deploy-${bundle.target}"
       description: >
-        Deploys the EchoStar FinOps Genie Space from the serialized JSON config.
+        Deploys the FinOps Genie Space from the serialized JSON config.
         Creates on first run; updates in-place on subsequent runs using the space
         ID stored in a workspace-side state file.
       tags:
@@ -28,7 +28,7 @@ resources:
         - name: space_title
           default: ${var.space_title}
         - name: space_config
-          default: "echostar_finops"   # stem under genie_spaces/
+          default: "finops_example"   # stem under genie_spaces/
 
     # ── Sync job ────────────────────────────────────────────────────────────────
     # Reads the live workspace state back to git after SMEs edit in the UI.
@@ -65,7 +65,7 @@ resources:
 
       parameters:
         - name: space_name
-          default: "echostar_finops"
+          default: "finops_example"
         - name: space_title
           default: ${var.space_title}
         - name: git_provider

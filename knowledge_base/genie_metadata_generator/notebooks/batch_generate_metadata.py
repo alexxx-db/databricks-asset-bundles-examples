@@ -5,7 +5,7 @@
 #
 # WHY headless batch mode:
 #   The Genify UI is great for individual tables (data owners interview one table
-#   at a time).  But for initial rollout across 19+ EchoStar business units you
+#   at a time).  But for initial rollout across many business units you
 #   need to bootstrap metadata for hundreds of tables without manual interviews.
 #
 #   This notebook:
@@ -48,10 +48,10 @@ if app_dir not in sys.path:
 
 # COMMAND ----------
 
-dbutils.widgets.text("uc_catalog",     "echostar_db_iceberg")
+dbutils.widgets.text("uc_catalog",     "example_catalog")
 dbutils.widgets.text("uc_schema",      "finops")
 dbutils.widgets.text("table_list",     "")
-dbutils.widgets.text("output_catalog", "echostar_db_iceberg")
+dbutils.widgets.text("output_catalog", "example_catalog")
 dbutils.widgets.text("output_schema",  "genie_metadata")
 dbutils.widgets.text("genie_space_id", "")
 dbutils.widgets.text("apply_to_genie", "false")

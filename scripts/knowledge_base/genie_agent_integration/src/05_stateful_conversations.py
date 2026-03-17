@@ -46,7 +46,7 @@ from langchain_core.tools import BaseTool
 # COMMAND ----------
 
 dbutils.widgets.text("genie_space_id", "YOUR_SPACE_ID_HERE")
-dbutils.widgets.text("secret_scope",   "echostar-genie")
+dbutils.widgets.text("secret_scope",   "my-genie")
 dbutils.widgets.text("secret_key",     "api_token")
 
 GENIE_SPACE_ID = dbutils.widgets.get("genie_space_id")
@@ -72,14 +72,14 @@ class StatefulDatabricksGenieTool(BaseTool):
 
     Usage in a LangChain agent:
       tool = StatefulDatabricksGenieTool(space_id=SPACE_ID)
-      tool.run("What is DBU spend today?", user_id="alice@echostar.com")
-      tool.run("Break that down by team.", user_id="alice@echostar.com")  # continues Alice's conversation
-      tool.run("What is DBU spend today?", user_id="bob@echostar.com")    # fresh conversation for Bob
+      tool.run("What is DBU spend today?", user_id="alice@example.com")
+      tool.run("Break that down by team.", user_id="alice@example.com")  # continues Alice's conversation
+      tool.run("What is DBU spend today?", user_id="bob@example.com")    # fresh conversation for Bob
     """
 
     name: str = "StatefulDatabricksGenie"
     description: str = (
-        "Use this to ask questions about EchoStar data. "
+        "Use this to ask questions about platform data. "
         "Maintains conversation context per user so follow-up questions work. "
         "To start a new conversation, include 'new_conversation: true' in your query. "
         "Input: natural language question."
@@ -251,7 +251,7 @@ print("ALICE's conversation thread")
 print("=" * 70)
 for q in alice_turns:
     print(f"\nQ: {q}")
-    answer = tool._run(q, user_id="alice@echostar.com")
+    answer = tool._run(q, user_id="alice@example.com")
     print(f"A: {answer[:500]}")   # truncate for readability
 
 print("\n" + "=" * 70)
@@ -259,7 +259,7 @@ print("BOB's conversation thread (independent context)")
 print("=" * 70)
 for q in bob_turns:
     print(f"\nQ: {q}")
-    answer = tool._run(q, user_id="bob@echostar.com")
+    answer = tool._run(q, user_id="bob@example.com")
     print(f"A: {answer[:500]}")
 
 # COMMAND ----------
@@ -270,13 +270,13 @@ print("ALICE resets her conversation")
 print("=" * 70)
 answer = tool._run(
     "What was total DBU spend last month? new_conversation: true",
-    user_id="alice@echostar.com",
+    user_id="alice@example.com",
 )
 print(f"Q: What was total DBU spend last month? (fresh)\nA: {answer[:500]}")
 
 # Verify conversation IDs are per-user
-print(f"\nAlice's conversation_id: {tool.get_conversation_id('alice@echostar.com')}")
-print(f"Bob's   conversation_id: {tool.get_conversation_id('bob@echostar.com')}")
-assert tool.get_conversation_id("alice@echostar.com") != tool.get_conversation_id("bob@echostar.com"), \
+print(f"\nAlice's conversation_id: {tool.get_conversation_id('alice@example.com')}")
+print(f"Bob's   conversation_id: {tool.get_conversation_id('bob@example.com')}")
+assert tool.get_conversation_id("alice@example.com") != tool.get_conversation_id("bob@example.com"), \
     "Users MUST have separate conversation IDs"
 print("✓ Per-user isolation confirmed")

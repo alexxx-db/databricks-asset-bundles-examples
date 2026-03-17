@@ -16,7 +16,7 @@
 # Usage:
 #   databricks bundle deploy --target dev
 #   databricks bundle run deploy_genie_space
-#   databricks bundle run sync_genie_space -p space_name=echostar_finops -p create_review=true
+#   databricks bundle run sync_genie_space -p space_name=finops_example -p create_review=true
 #
 # DABs known limitations patched here:
 #   - presets.name_prefix NOT applied to Apps; workaround: embed ${bundle.target} in app name
@@ -36,7 +36,7 @@ variables:
       warehouse: "Shared Unity Catalog Serverless"
 
   space_title:
-    default: "EchoStar FinOps Explorer"
+    default: "FinOps Explorer"
 
   # Set via: databricks bundle deploy --var space_id=<id>
   # Populated automatically after first deploy_genie_space run.
@@ -44,7 +44,7 @@ variables:
     default: ""
 
   uc_catalog:
-    default: "echostar_db_iceberg"
+    default: "example_catalog"
   uc_schema:
     default: "finops"
 
@@ -52,7 +52,7 @@ variables:
   git_provider:
     default: "github"
   git_repo:
-    default: "your-org/echostar-databricks"
+    default: "your-org/your-repo"
   git_branch:
     default: "main"
   git_base_url:
@@ -77,11 +77,11 @@ targets:
     default: true
     mode: development
     variables:
-      space_title: "EchoStar FinOps Explorer (dev)"
-      uc_catalog: "echostar_db_iceberg_dev"
+      space_title: "FinOps Explorer (dev)"
+      uc_catalog: "example_catalog_dev"
 
   prod:
     run_as:
       service_principal_name: genie-deploy-svc
     variables:
-      space_title: "EchoStar FinOps Explorer"
+      space_title: "FinOps Explorer"

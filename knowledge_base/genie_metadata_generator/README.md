@@ -111,9 +111,9 @@ databricks apps get genify-dev   # shows the app URL
 
 # Headless batch generation (bootstrap metadata for an entire schema)
 databricks bundle run genify_batch_generate \
-  -p uc_catalog=echostar_db_iceberg \
+  -p uc_catalog=example_catalog \
   -p uc_schema=finops \
-  -p output_catalog=echostar_db_iceberg \
+  -p output_catalog=example_catalog \
   -p output_schema=genie_metadata
 ```
 

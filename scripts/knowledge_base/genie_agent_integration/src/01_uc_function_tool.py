@@ -24,9 +24,9 @@
 
 # Parameters injected by the DABs job task
 dbutils.widgets.text("genie_space_id", "YOUR_SPACE_ID_HERE")
-dbutils.widgets.text("uc_catalog",     "echostar_db_iceberg")
+dbutils.widgets.text("uc_catalog",     "example_catalog")
 dbutils.widgets.text("uc_schema",      "genie_tools")
-dbutils.widgets.text("secret_scope",   "echostar-genie")
+dbutils.widgets.text("secret_scope",   "my-genie")
 dbutils.widgets.text("secret_key",     "api_token")
 
 genie_space_id = dbutils.widgets.get("genie_space_id")
@@ -64,7 +64,7 @@ create_fn_sql = f"""
 CREATE OR REPLACE FUNCTION {uc_catalog}.{uc_schema}.ask_genie(question STRING)
 RETURNS STRING
 LANGUAGE PYTHON
-COMMENT 'Ask a natural language question to the EchoStar FinOps Genie space.
+COMMENT 'Ask a natural language question to the FinOps Genie space.
          Genie translates the question into SQL, executes it, and returns a
          plain-English answer plus the generated SQL.
          Use for: cost lookups, usage trends, pipeline analysis.

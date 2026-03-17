@@ -44,7 +44,7 @@ mlflow.langchain.autolog()
 # Parameters
 dbutils.widgets.text("genie_space_id", "YOUR_SPACE_ID_HERE")
 dbutils.widgets.text("llm_endpoint",   "databricks-meta-llama-3-3-70b-instruct")
-dbutils.widgets.text("secret_scope",   "echostar-genie")
+dbutils.widgets.text("secret_scope",   "my-genie")
 dbutils.widgets.text("secret_key",     "api_token")
 
 GENIE_SPACE_ID = dbutils.widgets.get("genie_space_id")
@@ -158,7 +158,7 @@ class DatabricksGenieTool(BaseTool):
 
     name: str = "DatabricksGenie"
     description: str = (
-        "Use this tool to answer questions about EchoStar platform costs, DBU usage, "
+        "Use this tool to answer questions about platform costs, DBU usage, "
         "pipeline performance, and SQL warehouse spend. "
         "The tool queries live data via a Genie Space and returns either a "
         "text answer or tabular data. "

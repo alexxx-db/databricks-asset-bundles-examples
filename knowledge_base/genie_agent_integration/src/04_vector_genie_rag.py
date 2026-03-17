@@ -54,8 +54,8 @@ mlflow.langchain.autolog()
 dbutils.widgets.text("genie_space_id",         "YOUR_SPACE_ID_HERE")
 dbutils.widgets.text("llm_endpoint",           "databricks-meta-llama-3-3-70b-instruct")
 dbutils.widgets.text("vector_search_endpoint", "one-env-shared-endpoint-5")
-dbutils.widgets.text("vector_search_index",    "echostar_db_iceberg.genie_docs.space_doc_index")
-dbutils.widgets.text("secret_scope",           "echostar-genie")
+dbutils.widgets.text("vector_search_index",    "example_catalog.genie_docs.space_doc_index")
+    dbutils.widgets.text("secret_scope",           "my-genie")
 dbutils.widgets.text("secret_key",             "api_token")
 
 GENIE_SPACE_ID         = dbutils.widgets.get("genie_space_id")
@@ -192,7 +192,7 @@ def route_question(inputs: Dict[str, Any]) -> str:
 
 synthesis_prompt = ChatPromptTemplate.from_messages([
     ("system",
-     "You are a trusted EchoStar platform analyst. "
+     "You are a trusted platform analyst. "
      "You have been given two sources of information:\n\n"
      "LIVE DATA (from Genie):\n{genie_context}\n\n"
      "DOCUMENTATION (from Vector Search):\n{doc_context}\n\n"

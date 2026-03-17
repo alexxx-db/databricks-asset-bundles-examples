@@ -105,13 +105,13 @@ resources:
 
       parameters:
         - name: uc_catalog
-          default: "echostar_db_iceberg"
+          default: "example_catalog"
         - name: uc_schema
           default: "finops"
         - name: table_list
           default: ""   # empty = all tables in schema
         - name: output_catalog
-          default: "echostar_db_iceberg"
+          default: "example_catalog"
         - name: output_schema
           default: "genie_metadata"
         - name: genie_space_id

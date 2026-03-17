@@ -27,7 +27,7 @@
   "data_sources": {
     "tables": [
       {
-        "identifier": "echostar_db_iceberg.finops.workspace_dbu_daily",
+        "identifier": "example_catalog.finops.workspace_dbu_daily",
         "description": [
           "Daily DBU usage and cost rolled up per workspace, job, and user. ",
           "Sourced from Databricks system.billing.usage joined with list prices. ",
@@ -65,7 +65,7 @@
         ]
       },
       {
-        "identifier": "echostar_db_iceberg.finops.pipeline_runs",
+        "identifier": "example_catalog.finops.pipeline_runs",
         "description": [
           "Lakeflow pipeline run history with compute costs and data processed. ",
           "Joins pipeline metadata with billing data for cost-per-GB attribution."
@@ -94,7 +94,7 @@
         ]
       },
       {
-        "identifier": "echostar_db_iceberg.finops.sql_warehouse_usage",
+        "identifier": "example_catalog.finops.sql_warehouse_usage",
         "description": [
           "SQL warehouse serverless and classic usage by query and user. ",
           "Used to track BI / Genie query costs separately from job compute."
@@ -129,7 +129,7 @@
       {
         "id": "7a8b9c0d1e2f34567a8b9c0d1e2f3456",
         "content": [
-          "This Genie space answers questions about EchoStar Databricks platform cost and usage. ",
+          "This Genie space answers questions about Databricks platform cost and usage. ",
           "The primary tables are workspace_dbu_daily (daily DBU costs), pipeline_runs (ETL job costs), ",
           "and sql_warehouse_usage (BI / ad-hoc query costs). ",
           "When users ask about 'teams' or 'workstreams', filter on the custom_tags MAP column. ",
@@ -146,7 +146,7 @@
         "question": ["What is total DBU cost by SKU this month?"],
         "sql": [
           "SELECT sku_name, ROUND(SUM(cost_usd), 2) AS total_cost_usd\n",
-          "FROM echostar_db_iceberg.finops.workspace_dbu_daily\n",
+          "FROM example_catalog.finops.workspace_dbu_daily\n",
           "WHERE usage_date >= date_trunc('month', current_date())\n",
           "GROUP BY sku_name\n",
           "ORDER BY total_cost_usd DESC"
@@ -157,7 +157,7 @@
         "question": ["Which teams are spending the most on compute?"],
         "sql": [
           "SELECT custom_tags['team'] AS team, ROUND(SUM(cost_usd), 2) AS total_cost_usd\n",
-          "FROM echostar_db_iceberg.finops.workspace_dbu_daily\n",
+          "FROM example_catalog.finops.workspace_dbu_daily\n",
           "WHERE usage_date >= current_date() - INTERVAL 30 DAYS\n",
           "  AND custom_tags['team'] IS NOT NULL\n",
           "GROUP BY custom_tags['team']\n",
@@ -170,7 +170,7 @@
         "question": ["Show daily spend trend for the last 14 days"],
         "sql": [
           "SELECT usage_date, ROUND(SUM(cost_usd), 2) AS daily_cost_usd\n",
-          "FROM echostar_db_iceberg.finops.workspace_dbu_daily\n",
+          "FROM example_catalog.finops.workspace_dbu_daily\n",
           "WHERE usage_date >= current_date() - INTERVAL 14 DAYS\n",
           "GROUP BY usage_date\n",
           "ORDER BY usage_date"
@@ -181,7 +181,7 @@
         "question": ["What is the cost of failed pipeline runs this week?"],
         "sql": [
           "SELECT pipeline_name, COUNT(*) AS failed_runs, ROUND(SUM(dbu_cost_usd), 2) AS wasted_cost_usd\n",
-          "FROM echostar_db_iceberg.finops.pipeline_runs\n",
+          "FROM example_catalog.finops.pipeline_runs\n",
           "WHERE run_state = 'FAILED'\n",
           "  AND DATE(start_time) >= current_date() - INTERVAL 7 DAYS\n",
           "GROUP BY pipeline_name\n",
@@ -192,8 +192,8 @@
     "join_specs": [
       {
         "id": "9c0d1e2f34567a8b9c0d1e2f34567a9c",
-        "left_table":  "echostar_db_iceberg.finops.workspace_dbu_daily",
-        "right_table": "echostar_db_iceberg.finops.pipeline_runs",
+        "left_table":  "example_catalog.finops.workspace_dbu_daily",
+        "right_table": "example_catalog.finops.pipeline_runs",
         "join_columns": [
           {"left": "job_id", "right": "pipeline_id"}
         ],

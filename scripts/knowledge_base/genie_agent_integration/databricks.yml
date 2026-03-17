@@ -38,11 +38,11 @@ variables:
     description: >
       Fully-qualified Vector Search index name for hybrid RAG.
       Format: catalog.schema.index_name
-    default: "echostar_db_iceberg.genie_docs.space_doc_index"
+    default: "example_catalog.genie_docs.space_doc_index"
 
   secret_scope:
     description: Databricks secret scope for the Genie API token
-    default: "echostar-genie"
+    default: "my-genie"
 
   secret_key:
     description: Secret key within scope for Genie API PAT
@@ -50,7 +50,7 @@ variables:
 
   uc_catalog:
     description: UC catalog for the registered UC function
-    default: "echostar_db_iceberg"
+    default: "example_catalog"
 
   uc_schema:
     description: UC schema for the registered UC function
