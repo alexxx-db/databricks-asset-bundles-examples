@@ -15,10 +15,9 @@ on:
 jobs:
   validate:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repository
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        uses: actions/checkout@v4
 
       - name: Install Databricks CLI
         uses: databricks/setup-cli@main
@@ -30,7 +29,9 @@ jobs:
         run: |
           for dir in $(python scripts/discover_bundle_dirs.py); do
             echo "Validating $dir ..."
-            (cd "$dir" && databricks bundle validate -t dev) || exit 1
+            # We use --host to override the hardcoded URLs in the bundle config
+            (cd "$dir" && databricks bundle validate --host https://placeholder.databricks.com) || exit 1
           done
         env:
-          DATABRICKS_HOST: https://placeholder.databricks.com
+          # This dummy token stops the "cannot configure default credentials" error
+          DATABRICKS_TOKEN: "dapi-dummy-token-for-syntax-validation"
