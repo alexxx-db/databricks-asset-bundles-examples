@@ -85,7 +85,7 @@ class LakebaseBackend(StateBackend):
                 self.conn.commit()
                 logger.info(f"Ensured table {self.full_table} exists")
         except Exception as e:
-            logger.error(f"Error creating table: {e}")
+            logger.exception("Error creating table: %s", e)
             self.conn.rollback()
             raise
     
@@ -122,7 +122,7 @@ class LakebaseBackend(StateBackend):
                 self.conn.commit()
                 logger.debug(f"Set key {key} for session {self.session_key[:16]}...")
         except Exception as e:
-            logger.error(f"Error setting key {key}: {e}")
+            logger.exception("Error setting key %s: %s", key, e)
             self.conn.rollback()
             raise
     
@@ -137,7 +137,7 @@ class LakebaseBackend(StateBackend):
                 self.conn.commit()
                 logger.debug(f"Deleted key {key}")
         except Exception as e:
-            logger.error(f"Error deleting key {key}: {e}")
+            logger.error("Error deleting key %s: %s", key, e)
             self.conn.rollback()
     
     def exists(self, key: str) -> bool:
@@ -179,7 +179,7 @@ class LakebaseBackend(StateBackend):
                 logger.info(f"Cleared {count} keys with prefix {prefix}")
                 return count
         except Exception as e:
-            logger.error(f"Error clearing prefix {prefix}: {e}")
+            logger.exception("Error clearing prefix %s: %s", prefix, e)
             self.conn.rollback()
             return 0
     

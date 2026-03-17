@@ -37,6 +37,23 @@ jobs:
       - name: Run ruff
         run: ruff check knowledge_base/genie_metadata_generator/app/ contrib/data_engineering/
 
+  pyright:
+    runs-on:
+      group: databricks-protected-runner-group
+      labels: linux-ubuntu-latest
+
+    continue-on-error: true
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Install pyright
+        run: pip install pyright
+
+      - name: Run pyright
+        run: pyright
+
   py-compile:
     runs-on:
       group: databricks-protected-runner-group

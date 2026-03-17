@@ -120,7 +120,9 @@ def get_lakebase_connection():
         return _connection
         
     except Exception as e:
-        logger.error(f"Failed to connect to Lakebase at {host}:{port}/{database}: {e}")
+        logger.exception(
+            "Failed to connect to Lakebase at %s:%s/%s: %s", host, port, database, e
+        )
         raise
 
 

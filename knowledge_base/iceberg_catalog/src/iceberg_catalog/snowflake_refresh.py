@@ -36,7 +36,11 @@ from typing import Optional
 
 import snowflake.connector
 
-from iceberg_catalog.table_migration import TableLocation
+from iceberg_catalog.table_migration import (
+    TableLocation,
+    _validate_metadata_location,
+    _validate_snowflake_identifier,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -100,7 +104,10 @@ class SnowflakeRefreshClient:
         Refresh a single Snowflake-registered Iceberg table to point at
         the latest metadata committed by Databricks.
         """
-        fqsf = f"{self._sf_polaris_catalog}.{loc.schema.upper()}.{loc.table.upper()}"
+        ns = _validate_snowflake_identifier(loc.schema, "schema").upper()
+        tbl = _validate_snowflake_identifier(loc.table, "table").upper()
+        meta_path = _validate_metadata_location(loc.metadata_location)
+        fqsf = f"{self._sf_polaris_catalog}.{ns}.{tbl}"
 
         try:
             conn = snowflake.connector.connect(
@@ -113,11 +120,11 @@ class SnowflakeRefreshClient:
             with conn.cursor() as cur:
                 cur.execute(f"""
                     ALTER ICEBERG TABLE {fqsf}
-                    REFRESH METADATA_FILE_PATH = '{loc.metadata_location}'
+                    REFRESH METADATA_FILE_PATH = '{meta_path}'
                 """)
             conn.close()
 
-            logger.info("Refreshed %s → %s", fqsf, loc.metadata_location)
+            logger.info("Refreshed %s → %s", fqsf, meta_path)
             return RefreshResult(
                 table_fqn         = fqsf,
                 metadata_location = loc.metadata_location,
@@ -149,11 +156,14 @@ class SnowflakeRefreshClient:
             )
             with conn.cursor() as cur:
                 for loc in locations:
-                    fqsf = f"{self._sf_polaris_catalog}.{loc.schema.upper()}.{loc.table.upper()}"
+                    ns = _validate_snowflake_identifier(loc.schema, "schema").upper()
+                    tbl = _validate_snowflake_identifier(loc.table, "table").upper()
+                    meta_path = _validate_metadata_location(loc.metadata_location)
+                    fqsf = f"{self._sf_polaris_catalog}.{ns}.{tbl}"
                     try:
                         cur.execute(f"""
                             ALTER ICEBERG TABLE {fqsf}
-                            REFRESH METADATA_FILE_PATH = '{loc.metadata_location}'
+                            REFRESH METADATA_FILE_PATH = '{meta_path}'
                         """)
                         logger.info("Refreshed %s", fqsf)
                         results.append(RefreshResult(

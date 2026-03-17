@@ -54,7 +54,7 @@ Standalone examples that demonstrate specific bundle features and patterns.
 
 ## Community contributions
 
-See the [contrib](contrib) directory for community-contributed examples and templates.
+See the [contrib](contrib) directory for community-contributed examples and templates. To contribute changes, see [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Security and secrets
 
@@ -73,9 +73,9 @@ CI runs `yamllint`, Python syntax checks (`py_compile`), and `databricks bundle 
 
 ### Running tests
 
-- **SQL identifier validation (genie_metadata_generator):**
+- **genie_metadata_generator** (SQL identifiers and comment SQL):
   ```bash
-  PYTHONPATH=knowledge_base/genie_metadata_generator python -m pytest knowledge_base/genie_metadata_generator/tests/test_sql_identifiers.py -v
+  PYTHONPATH=knowledge_base/genie_metadata_generator python -m pytest knowledge_base/genie_metadata_generator/tests/test_sql_identifiers.py knowledge_base/genie_metadata_generator/tests/test_comment_sql.py -v
   ```
 - **add_asset.py (contrib/data_engineering):**
   ```bash
