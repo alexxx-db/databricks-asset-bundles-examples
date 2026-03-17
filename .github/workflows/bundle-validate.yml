@@ -1,5 +1,5 @@
-# Lightweight CI: validate bundle YAML and configuration for representative bundles.
-# Catches broken includes, invalid resource refs, and schema issues.
+# Lightweight CI: validate bundle YAML and configuration for all bundles.
+# Discovers bundle directories dynamically so new examples are validated automatically.
 # Validate runs with a placeholder host so no workspace auth is required.
 
 name: bundle-validate
@@ -18,19 +18,6 @@ jobs:
       group: databricks-protected-runner-group
       labels: linux-ubuntu-latest
 
-    strategy:
-      fail-fast: false
-      matrix:
-        bundle_dir:
-          - default_minimal
-          - default_python
-          - default_sql
-          - knowledge_base/alerts
-          - knowledge_base/iceberg_catalog
-          - knowledge_base/genie_metadata_generator
-          - knowledge_base/job_with_run_job_tasks
-          - knowledge_base/pipeline_with_schema
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
@@ -38,10 +25,14 @@ jobs:
       - name: Install Databricks CLI
         uses: databricks/setup-cli@main
 
-      - name: Validate bundle ${{ matrix.bundle_dir }}
+      - name: Install PyYAML
+        run: pip install pyyaml
+
+      - name: Validate all bundles
         run: |
-          cd "${{ matrix.bundle_dir }}"
-          databricks bundle validate -t dev
+          for dir in $(python scripts/discover_bundle_dirs.py); do
+            echo "Validating $dir ..."
+            (cd "$dir" && databricks bundle validate -t dev) || exit 1
+          done
         env:
-          # Placeholder host so validate runs without workspace auth (config-only check)
           DATABRICKS_HOST: https://placeholder.databricks.com

@@ -22,7 +22,8 @@ select = [
     "C4",  # flake8-comprehensions
 ]
 ignore = [
-    "E501",  # line too long (handled by formatter or per-project)
+    "E501",   # line too long (handled by formatter or per-project)
+    "F821",   # undefined name (spark/dbutils injected at runtime in Databricks notebooks)
 ]
 
 [tool.pyright]

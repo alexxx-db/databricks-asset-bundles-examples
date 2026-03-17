@@ -110,11 +110,11 @@ class SnowflakeRefreshClient:
                 warehouse = self._sf_warehouse,
                 role      = self._sf_role,
             )
-            cur = conn.cursor()
-            cur.execute(f"""
-                ALTER ICEBERG TABLE {fqsf}
-                REFRESH METADATA_FILE_PATH = '{loc.metadata_location}'
-            """)
+            with conn.cursor() as cur:
+                cur.execute(f"""
+                    ALTER ICEBERG TABLE {fqsf}
+                    REFRESH METADATA_FILE_PATH = '{loc.metadata_location}'
+                """)
             conn.close()
 
             logger.info("Refreshed %s → %s", fqsf, loc.metadata_location)
@@ -147,25 +147,24 @@ class SnowflakeRefreshClient:
                 warehouse = self._sf_warehouse,
                 role      = self._sf_role,
             )
-            cur = conn.cursor()
-
-            for loc in locations:
-                fqsf = f"{self._sf_polaris_catalog}.{loc.schema.upper()}.{loc.table.upper()}"
-                try:
-                    cur.execute(f"""
-                        ALTER ICEBERG TABLE {fqsf}
-                        REFRESH METADATA_FILE_PATH = '{loc.metadata_location}'
-                    """)
-                    logger.info("Refreshed %s", fqsf)
-                    results.append(RefreshResult(
-                        table_fqn=fqsf, metadata_location=loc.metadata_location, success=True
-                    ))
-                except Exception as e:
-                    logger.error("Refresh failed for %s: %s", fqsf, e)
-                    results.append(RefreshResult(
-                        table_fqn=fqsf, metadata_location=loc.metadata_location,
-                        success=False, error_message=str(e)
-                    ))
+            with conn.cursor() as cur:
+                for loc in locations:
+                    fqsf = f"{self._sf_polaris_catalog}.{loc.schema.upper()}.{loc.table.upper()}"
+                    try:
+                        cur.execute(f"""
+                            ALTER ICEBERG TABLE {fqsf}
+                            REFRESH METADATA_FILE_PATH = '{loc.metadata_location}'
+                        """)
+                        logger.info("Refreshed %s", fqsf)
+                        results.append(RefreshResult(
+                            table_fqn=fqsf, metadata_location=loc.metadata_location, success=True
+                        ))
+                    except Exception as e:
+                        logger.error("Refresh failed for %s: %s", fqsf, e)
+                        results.append(RefreshResult(
+                            table_fqn=fqsf, metadata_location=loc.metadata_location,
+                            success=False, error_message=str(e)
+                        ))
             conn.close()
 
         except Exception as e:

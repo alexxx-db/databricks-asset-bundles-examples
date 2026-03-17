@@ -46,6 +46,10 @@ The RAG chain is logged as an MLflow model so it can be:
 - Deployed to Model Serving for low-latency inference
 - Evaluated with `mlflow.evaluate()` against a golden dataset
 
+## Secrets
+
+Some tasks (e.g. **Pattern 1 — UC function**) accept `secret_scope` and `secret_key` as job parameters or notebook widgets. These must point to an existing Databricks secret scope and key that holds the **Genie API token** (or workspace PAT) used to call the Genie API. Create the scope and store the token before running; never log or commit the token. See [Databricks secrets](https://docs.databricks.com/security/secrets/secret-scopes.html) for how to create scopes and keys.
+
 ## Quick start
 
 ```bash

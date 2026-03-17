@@ -4,3 +4,25 @@ updates:
     directory: "/"
     schedule:
       interval: "monthly"
+
+  # Pip dependencies for key apps and templates
+  - package-ecosystem: "pip"
+    directory: "/knowledge_base/genie_metadata_generator/app"
+    schedule:
+      interval: "monthly"
+  - package-ecosystem: "pip"
+    directory: "/knowledge_base/genie_space_full/app"
+    schedule:
+      interval: "monthly"
+  - package-ecosystem: "pip"
+    directory: "/knowledge_base/app_with_database/app"
+    schedule:
+      interval: "monthly"
+  - package-ecosystem: "pip"
+    directory: "/mlops_stacks/mlops_stacks"
+    schedule:
+      interval: "monthly"
+  - package-ecosystem: "pip"
+    directory: "/dbt_sql"
+    schedule:
+      interval: "monthly"

@@ -36,13 +36,13 @@ def list_catalogs(connection):
     Returns:
         List of tuples: (catalog_name, catalog_owner, comment, created)
     """
-    cursor = connection.cursor()
-    cursor.execute("""
-        SELECT catalog_name, catalog_owner, comment, created
-        FROM system.information_schema.catalogs
-        ORDER BY catalog_name
-    """)
-    return cursor.fetchall()
+    with connection.cursor() as cursor:
+        cursor.execute("""
+            SELECT catalog_name, catalog_owner, comment, created
+            FROM system.information_schema.catalogs
+            ORDER BY catalog_name
+        """)
+        return cursor.fetchall()
 
 
 def list_schemas(connection, catalog):
@@ -56,14 +56,14 @@ def list_schemas(connection, catalog):
     Returns:
         List of tuples: (schema_name, schema_owner, comment)
     """
-    cursor = connection.cursor()
-    cursor.execute("""
-        SELECT schema_name, schema_owner, comment
-        FROM system.information_schema.schemata
-        WHERE catalog_name = ?
-        ORDER BY schema_name
-    """, [catalog.lower()])
-    return cursor.fetchall()
+    with connection.cursor() as cursor:
+        cursor.execute("""
+            SELECT schema_name, schema_owner, comment
+            FROM system.information_schema.schemata
+            WHERE catalog_name = ?
+            ORDER BY schema_name
+        """, [catalog.lower()])
+        return cursor.fetchall()
 
 
 def list_tables(connection, catalog, schema):
@@ -78,21 +78,21 @@ def list_tables(connection, catalog, schema):
     Returns:
         List of tuples: (table_name, table_type, comment, created_by, last_altered, data_source_format)
     """
-    cursor = connection.cursor()
-    cursor.execute("""
-        SELECT 
-            table_name,
-            table_type,
-            comment,
-            created_by,
-            last_altered,
-            data_source_format
-        FROM system.information_schema.tables
-        WHERE table_catalog = ?
-          AND table_schema = ?
-        ORDER BY table_name
-    """, [catalog.lower(), schema.lower()])
-    return cursor.fetchall()
+    with connection.cursor() as cursor:
+        cursor.execute("""
+            SELECT 
+                table_name,
+                table_type,
+                comment,
+                created_by,
+                last_altered,
+                data_source_format
+            FROM system.information_schema.tables
+            WHERE table_catalog = ?
+              AND table_schema = ?
+            ORDER BY table_name
+        """, [catalog.lower(), schema.lower()])
+        return cursor.fetchall()
 
 
 def get_table_columns(connection, catalog, schema, table):
@@ -108,21 +108,21 @@ def get_table_columns(connection, catalog, schema, table):
     Returns:
         List of tuples: (column_name, data_type, comment, ordinal_position, is_nullable)
     """
-    cursor = connection.cursor()
-    cursor.execute("""
-        SELECT 
-            column_name,
-            data_type,
-            comment,
-            ordinal_position,
-            is_nullable
-        FROM system.information_schema.columns
-        WHERE table_catalog = ?
-          AND table_schema = ?
-          AND table_name = ?
-        ORDER BY ordinal_position
-    """, [catalog.lower(), schema.lower(), table.lower()])
-    return cursor.fetchall()
+    with connection.cursor() as cursor:
+        cursor.execute("""
+            SELECT 
+                column_name,
+                data_type,
+                comment,
+                ordinal_position,
+                is_nullable
+            FROM system.information_schema.columns
+            WHERE table_catalog = ?
+              AND table_schema = ?
+              AND table_name = ?
+            ORDER BY ordinal_position
+        """, [catalog.lower(), schema.lower(), table.lower()])
+        return cursor.fetchall()
 
 
 def get_table_metadata(connection, catalog, schema, table):
@@ -138,23 +138,23 @@ def get_table_metadata(connection, catalog, schema, table):
     Returns:
         Tuple: (table_name, table_type, comment, created, created_by, last_altered, last_altered_by, data_source_format)
     """
-    cursor = connection.cursor()
-    cursor.execute("""
-        SELECT 
-            table_name,
-            table_type,
-            comment,
-            created,
-            created_by,
-            last_altered,
-            last_altered_by,
-            data_source_format
-        FROM system.information_schema.tables
-        WHERE table_catalog = ?
-          AND table_schema = ?
-          AND table_name = ?
-    """, [catalog.lower(), schema.lower(), table.lower()])
-    return cursor.fetchone()
+    with connection.cursor() as cursor:
+        cursor.execute("""
+            SELECT 
+                table_name,
+                table_type,
+                comment,
+                created,
+                created_by,
+                last_altered,
+                last_altered_by,
+                data_source_format
+            FROM system.information_schema.tables
+            WHERE table_catalog = ?
+              AND table_schema = ?
+              AND table_name = ?
+        """, [catalog.lower(), schema.lower(), table.lower()])
+        return cursor.fetchone()
 
 
 def build_table_context(connection, catalog, schema, table):

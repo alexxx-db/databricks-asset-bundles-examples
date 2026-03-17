@@ -71,6 +71,27 @@ From the repo root you can run:
 
 CI runs `yamllint`, Python syntax checks (`py_compile`), and `databricks bundle validate` for all discovered bundles.
 
+### Running tests
+
+- **SQL identifier validation (genie_metadata_generator):**
+  ```bash
+  PYTHONPATH=knowledge_base/genie_metadata_generator python -m pytest knowledge_base/genie_metadata_generator/tests/test_sql_identifiers.py -v
+  ```
+- **add_asset.py (contrib/data_engineering):**
+  ```bash
+  python -m pytest contrib/data_engineering/tests/test_add_asset.py -v
+  ```
+- **iceberg_catalog** (from `knowledge_base/iceberg_catalog`; requires deps):
+  ```bash
+  cd knowledge_base/iceberg_catalog && python -m pytest tests/ -v
+  ```
+- **mlops_stacks** (from bundle directory):
+  ```bash
+  cd mlops_stacks/mlops_stacks && python -m pytest tests/ -v
+  ```
+
+For production-like or long-lived apps, consider pinning dependency versions or using a lockfile (e.g. `pip-tools`, `poetry`) so upgrades are deliberate and reproducible.
+
 ## Learn more
 
 * [Databricks Asset Bundles documentation](https://docs.databricks.com/dev-tools/bundles/index.html)

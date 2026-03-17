@@ -172,10 +172,9 @@ def execute_comment_sql(sql: str) -> Tuple[bool, Optional[str]]:
     """
     try:
         connection = get_sql_connection()
-        cursor = connection.cursor()
-        cursor.execute(sql)
+        with connection.cursor() as cursor:
+            cursor.execute(sql)
         connection.commit()
-        cursor.close()
         return (True, None)
     except Exception as e:
         error_msg = f"Failed to execute COMMENT ON statement: {str(e)}"
