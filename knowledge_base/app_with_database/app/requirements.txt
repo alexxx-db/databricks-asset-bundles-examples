@@ -2,5 +2,5 @@ databricks-sdk>=0.60.0
 pandas
 psycopg[binary]
 psycopg-pool
-sqlalchemy==2.0.41
+sqlalchemy==2.0.48
 dash
