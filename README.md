@@ -6,6 +6,10 @@ This repository provides [Databricks Asset Bundles](https://docs.databricks.com/
 
 Install the [Databricks CLI](https://docs.databricks.com/dev-tools/cli/install.html) (v0.218.0 or above) and configure authentication for your workspace.
 
+## Repository layout
+
+The canonical bundle examples live at the repository root (e.g. `knowledge_base/`, `default_python/`). A `scripts/` directory may contain tooling or a mirror used by some workflows; when in doubt, use paths from the root. CI discovers all bundle directories automatically via `scripts/discover_bundle_dirs.py`, so new examples are validated without updating the workflow.
+
 ## Template-generated projects
 
 These projects were generated from the built-in `databricks bundle init` templates.
@@ -51,6 +55,21 @@ Standalone examples that demonstrate specific bundle features and patterns.
 ## Community contributions
 
 See the [contrib](contrib) directory for community-contributed examples and templates.
+
+## Security and secrets
+
+- **No credentials in the repo.** Use [Databricks secret scopes](https://docs.databricks.com/security/secrets/secret-scopes.html) or environment variables for API keys, tokens, and passwords.
+- Examples that need secrets (e.g. **iceberg_catalog**, **genie_space_full**, **job_read_secret**) document the required scope and key names in their own README; create those secrets in your workspace before running jobs or apps.
+- For notebooks that accept `secret_scope` / `secret_key` via widgets, ensure they point to existing secrets; tokens are never logged.
+
+## Code quality
+
+From the repo root you can run:
+
+- **Linting:** `ruff check .` (config in `pyproject.toml`)
+- **Type checking:** `pyright` (optional; config in `pyproject.toml`)
+
+CI runs `yamllint`, Python syntax checks (`py_compile`), and `databricks bundle validate` for all discovered bundles.
 
 ## Learn more
 

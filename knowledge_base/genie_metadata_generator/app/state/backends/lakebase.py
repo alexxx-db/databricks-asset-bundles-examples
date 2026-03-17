@@ -16,6 +16,8 @@ from typing import Any, List, Optional
 from datetime import datetime
 from .base import StateBackend
 
+from utils.sql_identifiers import validate_identifier
+
 logger = logging.getLogger(__name__)
 
 
@@ -41,9 +43,9 @@ class LakebaseBackend(StateBackend):
         self.conn = connection
         self.session_key = session_key
         self.user_email = user_email
-        self.schema = schema
-        self.table = table
-        self.full_table = f"{schema}.{table}"
+        self.schema = validate_identifier(schema, "schema")
+        self.table = validate_identifier(table, "table")
+        self.full_table = f"{self.schema}.{self.table}"
         
         # Ensure table exists on initialization
         self._ensure_table_exists()

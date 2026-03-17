@@ -28,6 +28,10 @@ does not delete it on subsequent runs.
 | `genie-space-full-permissions-{target}` | Job | PATCH `/api/2.0/permissions/genie/{space_id}` to grant ACLs |
 | `genie-qa-reviewer-{target}` | App | Streamlit app: re-execute any conversation's SQL under app SP identity |
 
+## Secrets
+
+The **sync_genie_space** job commits the live Genie space definition back to Git (GitHub or GitLab). It needs a Git PAT (personal access token) stored in a Databricks secret scope. Create the scope and key before running the sync job, and pass `secret_scope` and `secret_key` as job parameters (or set the bundle variables `git_secret_scope` / `git_secret_key` in `databricks.yml`). Never log or commit the token.
+
 ## Quick start
 
 ```bash

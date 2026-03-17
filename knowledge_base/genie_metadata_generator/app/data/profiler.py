@@ -10,6 +10,12 @@ References:
 import logging
 from datetime import datetime, timedelta
 
+from utils.sql_identifiers import (
+    InvalidIdentifierError,
+    quote_spark_identifier,
+    validate_identifier,
+)
+
 logger = logging.getLogger(__name__)
 
 
@@ -26,8 +32,14 @@ def get_table_profile(connection, catalog, schema, table, columns):
     
     Returns:
         Dict with table-level and column-level statistics
+    
+    Raises:
+        InvalidIdentifierError: If any catalog/schema/table/column name fails validation.
     """
-    full_name = f"`{catalog}`.`{schema}`.`{table}`"
+    catalog = validate_identifier(catalog, "catalog")
+    schema = validate_identifier(schema, "schema")
+    table = validate_identifier(table, "table")
+    full_name = f"{quote_spark_identifier(catalog)}.{quote_spark_identifier(schema)}.{quote_spark_identifier(table)}"
     
     profile = {
         "table": {
@@ -43,17 +55,18 @@ def get_table_profile(connection, catalog, schema, table, columns):
     # Get table-level statistics
     profile["table_stats"] = _get_table_statistics(connection, full_name, catalog, schema, table)
     
-    # Get column-level profiles
+    # Get column-level profiles (validate column names to prevent identifier injection)
     for col in columns:
+        col_name = validate_identifier(col["name"], "column")
         col_profile = _profile_column(
-            connection, 
-            full_name, 
-            col['name'], 
-            col['type'],
-            profile["table_stats"].get("row_count")
+            connection,
+            full_name,
+            col_name,
+            col["type"],
+            profile["table_stats"].get("row_count"),
         )
         if col_profile:
-            profile["column_profiles"][col['name']] = col_profile
+            profile["column_profiles"][col_name] = col_profile
     
     return profile
 
@@ -70,8 +83,14 @@ def get_table_statistics(connection, catalog, schema, table):
     
     Returns:
         Dict with table-level stats (row_count, size_bytes, format, etc.)
+    
+    Raises:
+        InvalidIdentifierError: If any catalog/schema/table name fails validation.
     """
-    full_name = f"`{catalog}`.`{schema}`.`{table}`"
+    catalog = validate_identifier(catalog, "catalog")
+    schema = validate_identifier(schema, "schema")
+    table = validate_identifier(table, "table")
+    full_name = f"{quote_spark_identifier(catalog)}.{quote_spark_identifier(schema)}.{quote_spark_identifier(table)}"
     return _get_table_statistics(connection, full_name, catalog, schema, table)
 
 
@@ -276,8 +295,8 @@ def _profile_date_column(cursor, full_name, column_name):
                         now = now.astimezone(max_date.tzinfo)
                     days_since_last = (now - max_date).days
                     stats["days_since_last"] = days_since_last
-                except:
-                    pass
+                except Exception as e:
+                    logger.debug("Could not compute date range stats: %s", e)
     
     except Exception as e:
         stats["error"] = f"Date profiling failed: {str(e)}"

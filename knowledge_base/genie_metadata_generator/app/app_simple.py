@@ -13,6 +13,11 @@ from data.information_schema import get_columns_for_table
 from state.services.profile_service import get_profile_service, ProfileService
 from state import get_state_manager
 from data.profile_formatter import format_profile_for_llm
+from utils.sql_identifiers import (
+    InvalidIdentifierError,
+    validate_identifier,
+    validate_qualified_table_name,
+)
 
 # Configure logging
 logging.basicConfig(
@@ -132,6 +137,8 @@ def generate_comment_sql(table_name: str, column_name: Optional[str], descriptio
     """
     Generate COMMENT ON TABLE/COLUMN SQL statement.
     
+    Validates table_name and column_name to prevent identifier/SQL injection.
+    
     Args:
         table_name: Fully qualified table name (catalog.schema.table)
         column_name: Column name (None for table comments)
@@ -139,13 +146,18 @@ def generate_comment_sql(table_name: str, column_name: Optional[str], descriptio
     
     Returns:
         SQL statement as string
-    """
-    escaped_desc = escape_sql_string(description)
     
+    Raises:
+        InvalidIdentifierError: If table_name or column_name fail validation.
+    """
+    parts = validate_qualified_table_name(table_name)
+    table_ref = ".".join(parts)
+    escaped_desc = escape_sql_string(description)
+
     if column_name:
-        return f"COMMENT ON COLUMN {table_name}.{column_name} IS '{escaped_desc}';"
-    else:
-        return f"COMMENT ON TABLE {table_name} IS '{escaped_desc}';"
+        col = validate_identifier(column_name, "column")
+        return f"COMMENT ON COLUMN {table_ref}.{col} IS '{escaped_desc}';"
+    return f"COMMENT ON TABLE {table_ref} IS '{escaped_desc}';"
 
 
 def execute_comment_sql(sql: str) -> Tuple[bool, Optional[str]]:

@@ -3,6 +3,16 @@
 Production DABs bundle managing the shared Iceberg catalog layer between
 Databricks (Unity Catalog) and Snowflake (Open Catalog / Polaris).
 
+## Secrets
+
+Create a Databricks secret scope (e.g. `iceberg-polaris`) and store the keys required by the jobs and notebooks. Never commit credentials to the repo. Required keys depend on your setup; typical ones include:
+
+- `snowflake_account`, `polaris_client_id`, `polaris_client_secret` (for Polaris/Open Catalog)
+- `instance_profile_arn` (for cluster S3 access)
+- `slack_webhook_url` (for breaking-drift alerts; optional)
+
+See `notebooks/01_create_connection.py` and `resources/iceberg_catalog.yml` for the exact scope and key names used. Configure the `secret_scope` variable in your bundle target or job parameters to point at your scope.
+
 ## Architecture
 
 ```
