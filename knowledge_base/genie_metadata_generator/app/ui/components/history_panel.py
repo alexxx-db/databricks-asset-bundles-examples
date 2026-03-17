@@ -8,7 +8,6 @@ import logging
 import streamlit as st
 from state import get_state_manager
 from config import config
-from typing import Optional
 from ui.utils.lakebase import is_lakebase_connected
 from ui.utils.cache import cached_state
 

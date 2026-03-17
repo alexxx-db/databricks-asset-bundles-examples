@@ -8,10 +8,9 @@ References:
 """
 
 import logging
-from datetime import datetime, timedelta
+from datetime import datetime
 
 from utils.sql_identifiers import (
-    InvalidIdentifierError,
     quote_spark_identifier,
     validate_identifier,
 )

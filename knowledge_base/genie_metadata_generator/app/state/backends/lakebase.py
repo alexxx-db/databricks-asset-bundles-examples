@@ -12,8 +12,7 @@ See: https://apps-cookbook.dev/docs/fastapi/building_endpoints/lakebase/
 """
 import json
 import logging
-from typing import Any, List, Optional
-from datetime import datetime
+from typing import Any, List
 from .base import StateBackend
 
 from utils.sql_identifiers import validate_identifier

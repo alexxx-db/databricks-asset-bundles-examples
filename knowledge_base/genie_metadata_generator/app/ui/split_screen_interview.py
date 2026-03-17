@@ -501,7 +501,7 @@ def _render_resume_card(interview: SectionBasedInterview, interview_type: str):
             table_name = interview.context_data.get('table', 'Unknown')
             st.markdown(f"**Table:** {table_name}")
         elif interview_type == 'genie':
-            st.markdown(f"**Genie Space Configuration**")
+            st.markdown("**Genie Space Configuration**")
         
         # Progress metrics (Material design)
         col1, col2 = st.columns(2)
@@ -610,8 +610,6 @@ def render_split_screen_interview(
         total = len(interview.sections)
         questions_answered = len(interview.conversation_history) // 2
         progress = current / total if total > 0 else 0
-        progress_pct = int(progress * 100)
-        
         col1, col2, col3 = st.columns(3)
         with col1:
             st.metric("Section", f"{current + 1} of {total}")
@@ -723,8 +721,7 @@ def render_split_screen_interview(
             if user_input:
                 try:
                     # Use service to answer question with auto-save
-                    response = interview_service.answer_question(interview, user_input, interview_type)
-                    
+                    interview_service.answer_question(interview, user_input, interview_type)
                     # Auto-save notification
                     if len(interview.conversation_history) % 6 == 0:
                         st.success("✓ Progress auto-saved", icon="💾")
@@ -875,7 +872,6 @@ def render_split_screen_interview(
 
 def render_table_interview_unified():
     """Render table comment interview using split-screen UI."""
-    from config import config
     
     state = get_state_manager()
     
@@ -1044,7 +1040,6 @@ def render_table_interview_unified():
 
 def render_genie_interview_unified():
     """Render Genie metadata interview using split-screen UI."""
-    from config import config
     
     state = get_state_manager()
     
@@ -1137,7 +1132,7 @@ def render_genie_interview_unified():
             return
         else:
             # Have completed tables - offer choice
-            st.info(f"**Ready to configure Genie Space**", icon=":material/auto_awesome:")
+            st.info("**Ready to configure Genie Space**", icon=":material/auto_awesome:")
             st.caption(f"You have {len(completed_tables)} completed table(s) in this session")
             
             st.divider()

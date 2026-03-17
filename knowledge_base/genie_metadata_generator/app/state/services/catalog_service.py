@@ -21,7 +21,6 @@ from data.information_schema import (
     list_tables,
     build_table_context
 )
-from data.profiler import get_table_statistics
 
 
 class CatalogService:

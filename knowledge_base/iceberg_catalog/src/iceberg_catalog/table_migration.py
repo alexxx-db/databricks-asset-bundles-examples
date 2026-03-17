@@ -23,6 +23,7 @@ from __future__ import annotations
 
 import json
 import logging
+import re
 from dataclasses import dataclass
 from typing import Optional
 
@@ -31,6 +32,31 @@ import snowflake.connector
 from databricks.sdk import WorkspaceClient
 
 logger = logging.getLogger(__name__)
+
+# Snowflake unquoted identifiers: alphanumeric and underscore (safe for interpolation)
+_SNOWFLAKE_IDENTIFIER_PATTERN = re.compile(r"^[a-zA-Z0-9_]+$")
+
+
+def _validate_snowflake_identifier(name: str, kind: str) -> str:
+    """Reject identifiers that could break Snowflake SQL (injection or invalid)."""
+    if not isinstance(name, str) or not name.strip():
+        raise ValueError(f"{kind} must be a non-empty string")
+    s = name.strip()
+    if not _SNOWFLAKE_IDENTIFIER_PATTERN.match(s):
+        raise ValueError(
+            f"{kind} may only contain letters, digits, and underscores, got: {s!r}"
+        )
+    return s
+
+
+def _validate_metadata_location(path: str) -> str:
+    """Reject metadata path that could break Snowflake SQL (e.g. quote injection)."""
+    if not isinstance(path, str) or not path.strip():
+        raise ValueError("metadata_location must be a non-empty string")
+    p = path.strip()
+    if "'" in p or ";" in p:
+        raise ValueError("metadata_location must not contain quote or semicolon")
+    return p
 
 
 @dataclass
@@ -195,11 +221,13 @@ class IcebergTableRegistrar:
     def _is_registered_in_snowflake(
         self, conn: snowflake.connector.SnowflakeConnection, namespace: str, table: str
     ) -> bool:
+        ns = _validate_snowflake_identifier(namespace, "namespace")
+        tbl = _validate_snowflake_identifier(table, "table")
         with conn.cursor() as cur:
             cur.execute(f"""
                 SELECT COUNT(*) FROM {self._sf_polaris_catalog}.INFORMATION_SCHEMA.TABLES
-                WHERE TABLE_SCHEMA = UPPER('{namespace}')
-                  AND TABLE_NAME   = UPPER('{table}')
+                WHERE TABLE_SCHEMA = UPPER('{ns}')
+                  AND TABLE_NAME   = UPPER('{tbl}')
             """)
             return cur.fetchone()[0] > 0
 
@@ -213,15 +241,16 @@ class IcebergTableRegistrar:
           - ALTER TABLE ... REFRESH: subsequent runs after Databricks writes
         """
         conn = self._sf_conn()
-        ns   = loc.schema.upper()
-        tbl  = loc.table.upper()
+        ns = _validate_snowflake_identifier(loc.schema, "schema").upper()
+        tbl = _validate_snowflake_identifier(loc.table, "table").upper()
+        meta_path = _validate_metadata_location(loc.metadata_location)
         fqsf = f"{self._sf_polaris_catalog}.{ns}.{tbl}"
 
         if self._is_registered_in_snowflake(conn, loc.schema, loc.table):
             logger.info("Table %s exists in Snowflake — refreshing metadata", fqsf)
             sql = f"""
                 ALTER ICEBERG TABLE {fqsf}
-                REFRESH METADATA_FILE_PATH = '{loc.metadata_location}'
+                REFRESH METADATA_FILE_PATH = '{meta_path}'
             """
         else:
             logger.info("Registering new Iceberg table %s in Snowflake", fqsf)
@@ -229,12 +258,12 @@ class IcebergTableRegistrar:
                 REGISTER ICEBERG TABLE {fqsf}
                   CATALOG           = '{self._sf_polaris_catalog}'
                   EXTERNAL_VOLUME   = '{self._sf_external_volume}'
-                  METADATA_FILE_PATH = '{loc.metadata_location}'
+                  METADATA_FILE_PATH = '{meta_path}'
             """
 
         with conn.cursor() as cur:
             cur.execute(sql)
-        logger.info("Snowflake registration/refresh complete for %s → %s", fqsf, loc.metadata_location)
+        logger.info("Snowflake registration/refresh complete for %s → %s", fqsf, meta_path)
         conn.close()
 
     def sync_catalog(self, uc_catalog: str, schemas: list[str]) -> list[TableLocation]:

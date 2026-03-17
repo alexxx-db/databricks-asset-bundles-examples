@@ -222,18 +222,18 @@ class LLMClient:
         for attempt in range(max_retries):
             try:
                 return self.chat(messages, max_tokens, temperature)
-            except LLMRateLimitError as e:
+            except LLMRateLimitError:
                 if attempt == max_retries - 1:
                     raise
                 wait_time = 2 ** attempt  # Exponential backoff: 1s, 2s, 4s
                 logger.warning(f"Rate limited, waiting {wait_time}s before retry {attempt + 1}/{max_retries}...")
                 time.sleep(wait_time)
-            except LLMTimeoutError as e:
+            except LLMTimeoutError:
                 if attempt == max_retries - 1:
                     raise
                 wait_time = 2 ** attempt
                 logger.warning(f"Timeout, waiting {wait_time}s before retry {attempt + 1}/{max_retries}...")
                 time.sleep(wait_time)
-            except Exception as e:
+            except Exception:
                 # Don't retry for other errors
                 raise

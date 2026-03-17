@@ -3,7 +3,6 @@ Context Summarizer Service
 Handles conditional LLM-based summarization of large contexts.
 """
 import logging
-from typing import Optional
 from llm.client import LLMClient
 
 logger = logging.getLogger(__name__)

@@ -37,7 +37,6 @@ import logging
 import os
 import sys
 from pathlib import Path
-from typing import Any, Optional
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)-8s %(message)s")
 logger = logging.getLogger(__name__)
@@ -193,7 +192,6 @@ for tname, profile in profiles.items():
 # Step 4: Persist YAML to Unity Catalog table
 # ---------------------------------------------------------------------------
 
-import pyspark.sql.functions as F
 from pyspark.sql.types import StringType, StructField, StructType
 
 spark.sql(f"CREATE SCHEMA IF NOT EXISTS {output_catalog}.{output_schema}")
@@ -223,7 +221,6 @@ logger.info("Wrote %d metadata records to %s", len(rows), output_table)
 
 if apply_to_genie and genie_space_id:
     from databricks.sdk import WorkspaceClient
-    import requests
 
     w = WorkspaceClient()
     host = w.config.host.rstrip("/")

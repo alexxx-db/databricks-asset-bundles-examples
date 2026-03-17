@@ -6,15 +6,12 @@ AI-powered description generator for Databricks Unity Catalog tables and columns
 import streamlit as st
 import logging
 from typing import Optional, Tuple
-from config import config
 from llm.client import get_main_llm_client
 from auth.service_principal import get_sql_connection
 from data.information_schema import get_columns_for_table
 from state.services.profile_service import get_profile_service, ProfileService
 from state import get_state_manager
-from data.profile_formatter import format_profile_for_llm
 from utils.sql_identifiers import (
-    InvalidIdentifierError,
     validate_identifier,
     validate_qualified_table_name,
 )

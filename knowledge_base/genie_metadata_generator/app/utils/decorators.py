@@ -1,7 +1,7 @@
 """Utility decorators for common patterns."""
 import logging
 from functools import wraps
-from typing import Optional, Any
+from typing import Any
 
 logger = logging.getLogger(__name__)
 

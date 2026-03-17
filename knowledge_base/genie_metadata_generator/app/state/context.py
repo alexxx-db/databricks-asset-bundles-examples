@@ -10,7 +10,7 @@ Uses HTTP headers forwarded by Databricks Apps reverse proxy:
 
 See: https://docs.databricks.com/aws/en/dev-tools/databricks-apps/http-headers
 """
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from datetime import datetime
 from typing import Optional, Dict
 import hashlib

@@ -61,7 +61,7 @@ def initialize_session_state():
         # Log Lakebase connection status and ensure tables exist
         if config.lakebase_enabled:
             try:
-                from state.db import get_connection_status, get_persistence_service
+                from state.db import get_connection_status
                 from state.schema import ensure_genify_schema_exists
                 from state.db import get_lakebase_connection_safe
                 

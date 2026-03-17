@@ -474,7 +474,7 @@ class HTTPClient:
             if response is not None:
                 try:
                     response_text = str(response.json())
-                except:
+                except Exception:
                     response_text = (
                         response.text
                         if hasattr(response, "text")

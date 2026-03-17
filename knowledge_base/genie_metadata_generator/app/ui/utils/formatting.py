@@ -4,7 +4,6 @@ UI formatting utilities for consistent display across the application.
 Provides standard formatters for common UI elements like counts, timestamps,
 queue status, and time estimates.
 """
-from typing import Optional
 
 
 def format_table_count(count: int, suffix: str = "table") -> str:

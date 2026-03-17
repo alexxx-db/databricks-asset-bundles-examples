@@ -3,7 +3,7 @@ Data format conversion utilities.
 Atomic functions for converting between different data formats.
 """
 import logging
-from typing import Dict, Optional
+from typing import Optional
 
 logger = logging.getLogger(__name__)
 

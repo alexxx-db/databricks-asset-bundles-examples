@@ -5,8 +5,11 @@ Handles all library operations with graceful degradation when
 Lakebase is unavailable.
 """
 import logging
-from typing import List, Dict, Optional
+from typing import TYPE_CHECKING, List, Dict, Optional
 from functools import wraps
+
+if TYPE_CHECKING:
+    from ..persistence import PersistenceService
 
 logger = logging.getLogger(__name__)
 

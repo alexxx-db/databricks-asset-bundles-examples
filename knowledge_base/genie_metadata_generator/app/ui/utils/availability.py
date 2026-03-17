@@ -2,7 +2,6 @@
 Utilities for checking service availability and showing appropriate UI feedback.
 """
 import streamlit as st
-from functools import wraps
 from config import config
 
 

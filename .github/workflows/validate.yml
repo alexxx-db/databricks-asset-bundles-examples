@@ -35,8 +35,7 @@ jobs:
         run: pip install ruff
 
       - name: Run ruff
-        run: ruff check knowledge_base/genie_metadata_generator/ contrib/data_engineering/ --output-format=concise
-        continue-on-error: true  # Fix remaining issues over time; does not block merge
+        run: ruff check knowledge_base/genie_metadata_generator/app/ contrib/data_engineering/
 
   py-compile:
     runs-on:

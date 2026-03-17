@@ -16,7 +16,10 @@ See: https://docs.databricks.com/aws/en/dev-tools/databricks-apps/lakebase
 """
 import os
 import logging
-from typing import Optional
+from typing import TYPE_CHECKING, Optional
+
+if TYPE_CHECKING:
+    from .persistence import PersistenceService
 
 logger = logging.getLogger(__name__)
 
@@ -108,9 +111,12 @@ def get_lakebase_connection():
         # Log successful connection with server info
         with _connection.cursor() as cur:
             cur.execute("SELECT version()")
-            version = cur.fetchone()[0].split(',')[0] if cur.fetchone else "unknown"
-        
-        logger.info(f"Lakebase connection established successfully to {host}:{port}/{database}")
+            row = cur.fetchone()
+            version = row[0].split(",")[0] if row else "unknown"
+        logger.info(
+            "Lakebase connection established successfully to %s:%s/%s (version: %s)",
+            host, port, database, version,
+        )
         return _connection
         
     except Exception as e:

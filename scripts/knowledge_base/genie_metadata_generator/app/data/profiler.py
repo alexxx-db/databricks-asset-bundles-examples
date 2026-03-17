@@ -276,8 +276,8 @@ def _profile_date_column(cursor, full_name, column_name):
                         now = now.astimezone(max_date.tzinfo)
                     days_since_last = (now - max_date).days
                     stats["days_since_last"] = days_since_last
-                except:
-                    pass
+                except Exception as e:
+                    logger.debug("Could not compute date range stats: %s", e)
     
     except Exception as e:
         stats["error"] = f"Date profiling failed: {str(e)}"
@@ -363,6 +363,7 @@ def _get_top_values(cursor, full_name, column_name, limit=10):
         return top_values
     
     except Exception as e:
+        logger.debug("Could not get top values for column: %s", e)
         return []
 
 
@@ -375,5 +376,6 @@ def _format_bytes(bytes_val):
                 return f"{bytes_val:.2f} {unit}"
             bytes_val /= 1024.0
         return f"{bytes_val:.2f} PB"
-    except:
+    except Exception as e:
+        logger.debug("Could not format bytes value: %s", e)
         return None

@@ -53,7 +53,7 @@ def _create_backend(context: SessionContext):
                 schema=config.lakebase_schema,
                 table=config.lakebase_table
             )
-            logger.info(f"Using LakebaseBackend for persistent state")
+            logger.info("Using LakebaseBackend for persistent state")
             return backend
             
         except ImportError as e:

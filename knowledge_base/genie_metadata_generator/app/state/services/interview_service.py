@@ -4,10 +4,10 @@ Interview service for managing interview lifecycle and operations atomically.
 Single source of truth for interview operations with proper state coordination.
 """
 import logging
-from typing import Optional, Dict, List
+from typing import Optional
 from state import StateManager
 from llm.section_interview import SectionBasedInterview
-from llm.client import LLMClient, get_cached_llm_client
+from llm.client import LLMClient
 from .context_summarizer_service import ContextSummarizerService
 
 logger = logging.getLogger(__name__)
@@ -540,8 +540,6 @@ def get_interview_service(state_manager: StateManager) -> InterviewService:
     """
     import streamlit as st
     from .context_summarizer_service import get_context_summarizer_service
-    from config import config
-    from llm.client import get_cached_llm_client
     
     # Cache the service instance per session
     if '_interview_service' not in st.session_state:

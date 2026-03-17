@@ -4,9 +4,11 @@ Handles all interactions with the relational database schema.
 """
 import json
 import logging
-from typing import List, Dict, Optional, Any
-from datetime import datetime
+from typing import TYPE_CHECKING, List, Dict, Optional
 from .schema import ensure_genify_schema_exists
+
+if TYPE_CHECKING:
+    from .services.library_service import LibraryService
 
 logger = logging.getLogger(__name__)
 

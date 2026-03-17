@@ -1,7 +1,7 @@
 """
 Centralized state management for Genify.
 """
-from typing import Optional, List, Dict, Any
+from typing import Optional, List, Dict
 from .backends.base import StateBackend
 from .context import SessionContext
 from .models import TableIdentifier
@@ -253,8 +253,6 @@ class StateManager:
         # Deserialize from dict (LakebaseBackend or restored session)
         from llm.section_interview import SectionBasedInterview
         from state.services import get_context_summarizer_service
-        from config import config
-        from llm.client import get_cached_llm_client
         
         # Create fresh LLM client
         llm = self._create_llm_client()
@@ -558,7 +556,6 @@ class StateManager:
             # Deserialize table interview if exists
             from state.services import get_context_summarizer_service
             from config import config
-            from llm.client import get_cached_llm_client
             
             llm = self._create_llm_client()
             
