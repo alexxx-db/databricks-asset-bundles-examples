@@ -1,0 +1,160 @@
+
+#!/bin/bash
+
+set -euo pipefail
+
+function cleanup() {
+    cd "$1"
+    local BUNDLE_UUID="$2"
+    
+    # Replace specific names with company.databricks.com, user@company.com, user_name
+    find . -type f -exec sed -i '' -E 's|e2[^[:space:]]*\.com|company.databricks.com|g' {} \;
+    find . -type f -exec sed -i '' -E 's|[A-Za-z0-9._%+-]+@databricks\.com|user@company.com|g' {} \;
+    find . -type f -exec sed -i '' -e "s|$CURRENT_USER_NAME|user_name|g" {} \;    
+    find . -type f -exec sed -i '' -E "s|^([[:space:]]*uuid:[[:space:]]*)[^[:space:]]*[[:space:]]*$|\\1$BUNDLE_UUID|g" {} \;
+    
+    cd ..
+}
+
+function init_bundle() {
+    local TEMPLATE_NAME="$1"
+    local BUNDLE_UUID="${2:-}"
+    local CONFIG_JSON="$3"
+
+    # Extract project_name from JSON
+    local PROJECT_NAME=$(echo "$CONFIG_JSON" | grep -o '"project_name"[[:space:]]*:[[:space:]]*"[^"]*"' | cut -d'"' -f4)
+
+    # Use CLI_COMMAND if set, otherwise default to 'databricks'
+    local CLI_COMMAND="${CLI_COMMAND:-databricks}"
+
+    echo
+    echo "# $PROJECT_NAME"
+
+    rm -rf "$PROJECT_NAME"
+    echo "$CONFIG_JSON" > /tmp/config.json
+    $CLI_COMMAND bundle init "$TEMPLATE_NAME" --config-file /tmp/config.json
+    cleanup "$PROJECT_NAME" "$BUNDLE_UUID"
+}
+
+# Check and extract the host from the databrickscfg file
+if [ ! -f ~/.databrickscfg ]; then
+    echo "Error: ~/.databrickscfg not found." >&2
+    exit 1
+fi
+
+DATABRICKS_HOST=$(grep -A1 '\[DEFAULT\]' ~/.databrickscfg | grep 'host' | awk -F'=' '{print $2}' | xargs || true)
+if [ ! "$DATABRICKS_HOST" ]; then
+    echo "Error: expected ~/.databrickscfg file with a [DEFAULT] section with the first line of the form 'host=...'." >&2
+    exit 1
+fi
+
+# Prompt for CURRENT_USER_NAME if not passed as first arg
+if [ -n "${1-}" ]; then 
+    CURRENT_USER_NAME="$1"
+else
+    read -r -p "Enter the current user name of your 'DEFAULT' profile (e.g., 'lennart_kats'): " CURRENT_USER_NAME
+    if [ -z "${CURRENT_USER_NAME:-}" ]; then
+        echo "Error: current user name is required." >&2
+        exit 1
+    fi
+fi
+
+cd $(dirname $0)/..
+
+# Use the 'databricks' CLI by default
+# To use a custom CLI, set: export CLI_COMMAND=/path/to/cli
+echo "Using Databricks CLI: ${CLI_COMMAND:-databricks}"
+${CLI_COMMAND:-databricks} --version
+echo
+
+init_bundle "default-python" "87d5a23e-7bc7-4f52-98ee-e374b67d5681" '{
+    "project_name":     "default_python",
+    "include_job":      "yes",
+    "include_pipeline": "yes",
+    "include_python":   "yes",
+    "serverless":       "yes",
+    "default_catalog":  "catalog",
+    "personal_schemas": "yes"
+}'
+
+init_bundle "default-sql" "853cd9bc-631c-4d4f-bca0-3195c7540854" '{
+    "project_name":     "default_sql",
+    "http_path":        "/sql/1.0/warehouses/abcdef1234567890",
+    "default_catalog":  "catalog",
+    "personal_schemas": "yes, automatically use a schema based on the current user name during development"
+}'
+
+init_bundle "dbt-sql" "5e5ca8d5-0388-473e-84a1-1414ed89c5df" '{
+    "project_name":     "dbt_sql",
+    "http_path":        "/sql/1.0/warehouses/abcdef1234567890",
+    "serverless":       "yes",
+    "default_catalog":  "catalog",
+    "personal_schemas": "yes, use a schema based on the current user name during development"
+}'
+
+init_bundle "lakeflow-pipelines" "295000fc-1ea8-4f43-befe-d5fb9f7d4ad4" '{
+    "project_name":     "lakeflow_pipelines_sql",
+    "default_catalog":  "catalog",
+    "personal_schemas": "yes",
+    "language":         "sql"
+}'
+
+
+init_bundle "lakeflow-pipelines" "87a174ba-60e4-4867-a140-1936bc9b00de" '{
+    "project_name":     "lakeflow_pipelines_python",
+    "default_catalog":  "catalog",
+    "personal_schemas": "yes",
+    "language":         "python"
+}'
+
+init_bundle "default-minimal" "8127e9c1-adac-4c9c-b006-d3450874f663" '{
+    "project_name":     "default_minimal",
+    "default_catalog":  "catalog",
+    "personal_schemas": "yes",
+    "language_choice":  "sql"
+}'
+
+# Add minimal job and notebook to default_minimal so the bundle has one deployable resource
+mkdir -p default_minimal/src default_minimal/resources
+cat > default_minimal/src/minimal_notebook.py << 'MINIMAL_NB'
+# Databricks notebook source
+# MAGIC %md
+# MAGIC Minimal notebook for the default_minimal bundle. Replace this with your own logic.
+
+# COMMAND ----------
+
+print("Minimal bundle job ran successfully.")
+MINIMAL_NB
+cat > default_minimal/resources/default_minimal_job.yml << 'MINIMAL_JOB'
+# Minimal job for the default_minimal template.
+resources:
+  jobs:
+    default_minimal_job:
+      name: "default_minimal_job-${bundle.target}"
+      parameters:
+        - name: catalog
+          default: ${var.catalog}
+        - name: schema
+          default: ${var.schema}
+      tasks:
+        - task_key: minimal_notebook
+          notebook_task:
+            notebook_path: ./src/minimal_notebook.py
+          new_cluster:
+            spark_version: "15.4.x-scala2.12"
+            node_type_id: "i3.xlarge"
+            num_workers: 0
+            spark_conf:
+              spark.databricks.cluster.profile: singleNode
+              master: "local[*]"
+MINIMAL_JOB
+
+init_bundle "pydabs" "4062028b-2184-4acd-9c62-f2ec572f7843" '{
+    "project_name":     "pydabs",
+    "include_job":      "yes",
+    "include_pipeline": "yes",
+    "include_python":   "yes",
+    "serverless":       "yes",
+    "default_catalog":  "catalog",
+    "personal_schemas": "yes"
+}'

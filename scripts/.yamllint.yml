@@ -1,0 +1,21 @@
+---
+extends: default
+
+rules:
+  truthy: disable
+  document-start: disable
+  line-length:
+    max: 210
+  # Relax cosmetic rules to match existing codebase conventions.
+  # The main value of yamllint here is catching syntax errors.
+  trailing-spaces: disable
+  new-line-at-end-of-file: disable
+  empty-lines: disable
+  indentation: disable
+  comments: disable
+  comments-indentation: disable
+  colons: disable
+
+ignore:
+  - contrib/templates/
+  - .github/

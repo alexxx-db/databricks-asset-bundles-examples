@@ -1,0 +1,120 @@
+resources:
+  apps:
+    # ── Genify App ────────────────────────────────────────────────────────────
+    # IMPORTANT (DABs bug #3131, closed "not planned"):
+    #   presets.name_prefix is NOT applied to `apps` resources — only to
+    #   jobs, pipelines, and SQL objects. Workaround: embed ${bundle.target}
+    #   in the name field directly.
+    #
+    # IMPORTANT: `tags` on App resources are silently dropped by DABs.
+    #   The Apps REST API does not support tags. Tag Jobs/Pipelines instead.
+    genify:
+      name: "genify-${bundle.target}"
+      description: >
+        AI-powered Genie Space metadata generator. Conducts structured LLM
+        interviews with data owners to generate production-quality Genie
+        instructions, example SQL, column descriptions, and join specs.
+        Supports both in-memory sessions (dev) and Lakebase persistence (prod).
+
+      source_code_path: ./app
+
+      # Environment variables injected into the Streamlit app at runtime.
+      # App code reads these via os.environ / AppConfig.
+      environment:
+        - name: LLM_ENDPOINT_NAME
+          value: ${var.llm_endpoint}
+        - name: SUMMARIZER_ENDPOINT_NAME
+          value: ${var.summarizer_endpoint}
+        - name: DATABRICKS_WAREHOUSE_ID
+          value: ${var.warehouse_id}
+        - name: LAKEBASE_ENABLED
+          value: ${var.lakebase_enabled}
+        # App runtime provides DATABRICKS_HOST, DATABRICKS_CLIENT_ID,
+        # DATABRICKS_CLIENT_SECRET automatically — do not set manually.
+
+      # Lakebase resource (PostgreSQL) for persistent session storage.
+      # Only active when lakebase_enabled=true.  The app runtime provides
+      # the connection details via the app context; the app reads them
+      # from the Lakebase SDK (psycopg2 connection).
+      # Uncomment in prod when Lakebase is provisioned:
+      # databases:
+      #   - name: genify-lakebase
+      #     database_name: genify
+      #     instance_name: genify-pg
+
+  jobs:
+    # ── Lakebase migration job ─────────────────────────────────────────────
+    # Run once to create the PostgreSQL schema and sessions table in Lakebase.
+    # Only needed when lakebase_enabled=true.
+    genify_lakebase_migration:
+      name: "genify-lakebase-migration-${bundle.target}"
+      description: >
+        Runs the Lakebase migration script to create the genify.user_sessions
+        table in PostgreSQL. Run once after deploying the app with
+        lakebase_enabled=true.
+      tags:
+        team: platform
+        workstream: governance
+
+      tasks:
+        - task_key: run_migration
+          notebook_task:
+            notebook_path: ./notebooks/run_lakebase_migration.py
+            base_parameters:
+              warehouse_id: ${var.warehouse_id}
+          new_cluster:
+            spark_version: "15.4.x-scala2.12"
+            node_type_id: "i3.xlarge"
+            num_workers: 0
+            spark_conf:
+              spark.databricks.cluster.profile: singleNode
+              master: local[*]
+
+    # ── Batch metadata generation job ────────────────────────────────────────
+    # Headless mode: generate Genie metadata for a list of tables without
+    # the UI interview step. Useful for bootstrapping metadata for large catalogs.
+    genify_batch_generate:
+      name: "genify-batch-metadata-generate-${bundle.target}"
+      description: >
+        Headless batch metadata generation for multiple tables.
+        Uses auto-profiling (ANALYZE TABLE + info_schema) to generate
+        Genie metadata YAML without UI interaction.
+      tags:
+        team: platform
+        workstream: governance
+
+      tasks:
+        - task_key: batch_generate
+          notebook_task:
+            notebook_path: ./notebooks/batch_generate_metadata.py
+            base_parameters:
+              uc_catalog:      "{{job.parameters.uc_catalog}}"
+              uc_schema:       "{{job.parameters.uc_schema}}"
+              table_list:      "{{job.parameters.table_list}}"
+              output_catalog:  "{{job.parameters.output_catalog}}"
+              output_schema:   "{{job.parameters.output_schema}}"
+              genie_space_id:  "{{job.parameters.genie_space_id}}"
+              apply_to_genie:  "{{job.parameters.apply_to_genie}}"
+          new_cluster:
+            spark_version: "15.4.x-scala2.12"
+            node_type_id: "i3.xlarge"
+            num_workers: 0
+            spark_conf:
+              spark.databricks.cluster.profile: singleNode
+              master: local[*]
+
+      parameters:
+        - name: uc_catalog
+          default: "echostar_db_iceberg"
+        - name: uc_schema
+          default: "finops"
+        - name: table_list
+          default: ""   # empty = all tables in schema
+        - name: output_catalog
+          default: "echostar_db_iceberg"
+        - name: output_schema
+          default: "genie_metadata"
+        - name: genie_space_id
+          default: ""
+        - name: apply_to_genie
+          default: "false"

@@ -1,0 +1,8 @@
+# Table Identity - Basic table identification
+# This section is populated first with catalog, schema, table name
+
+table_identity:
+  catalog: "main"
+  schema: "schema_name"
+  name: "table_name"
+  business_name: "Table Business Name"

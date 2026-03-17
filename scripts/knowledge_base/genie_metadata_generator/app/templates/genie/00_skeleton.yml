@@ -1,0 +1,20 @@
+# Space Identity and Table Identity
+# Basic identification for this Genie space and the table
+
+space_identity:
+  space_name: "Space Name"
+  purpose: "Purpose of this Genie space"
+  audience:
+    - "Primary audience"
+    - "Secondary audience"
+  
+tables:
+  - name: "table_name"
+    catalog: "main"
+    schema: "schema_name"
+  - name: "table_name"
+    catalog: "main"
+    schema: "schema_name"
+  - name: "table_name"
+    catalog: "main"
+    schema: "schema_name"

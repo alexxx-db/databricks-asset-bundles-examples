@@ -1,0 +1,45 @@
+# SPACE-SPECIFIC CONTEXT - Additional guidance for this space
+
+space_context:
+  focus_areas:
+    - "What this space is designed for"
+    - "Primary use cases"
+    - "Target analysis types"
+  
+  excluded_from_scope:
+    - "What is NOT in this space (separate spaces)"
+    - "Out of scope analysis"
+  
+  default_filters:
+    - "Default filter 1"
+    - "Default filter 2"
+    - "Always apply these unless explicitly asked not to"
+  
+  common_user_questions:
+    - "Example question users typically ask"
+    - "Another common question"
+    - "Frequent query pattern"
+
+# COLUMN VISIBILITY - Which columns to show/hide in this space
+
+column_visibility:
+  always_show:
+    - "column1"
+    - "column2"
+    - "Important columns that should always appear"
+  
+  hide_from_space:
+    - "technical_column"
+    - "internal_field"
+    - reason: "Why these columns are hidden"
+
+# METADATA - Space-level metadata
+
+space_metadata:
+  created_date: "YYYY-MM-DD"
+  last_updated: "YYYY-MM-DD"
+  space_owner: "Team or person"
+  
+  version_notes:
+    - "v1.0: Initial notes"
+    - "v1.1: What changed"

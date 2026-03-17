@@ -1,0 +1,25 @@
+# Data Quality - Safety and Trust
+
+# Rule 16: Analytical Warnings (What NOT to do)
+warnings:
+  - warning: "Do NOT use for revenue settlement"
+    context: "Data is pre-settlement and may change. Use 'finance_settled_orders' instead."
+  - warning: "Avoid aggregating without 'currency' filter"
+    context: "Table contains mixed currencies."
+
+# Rule 18: Edge Case Documentation
+edge_cases:
+  - scenario: "System downtime gaps"
+    impact: "Missing data for 2023-11-05"
+    handling: "Exclude this date range from trend analysis"
+  - scenario: "Test Accounts"
+    impact: "User IDs starting with '999' are internal test accounts"
+
+# Rule 14: Quality Indicators
+quality_metrics:
+  completeness:
+    overall_rate: "99.5%"
+    known_gaps: "Missing 'device_type' for mobile web users prior to 2024"
+  freshness:
+    sla: "T+1 Day"
+    lag_time: "Approx 4 hours after close of business"

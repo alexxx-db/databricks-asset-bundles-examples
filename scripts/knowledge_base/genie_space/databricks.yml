@@ -1,0 +1,43 @@
+bundle:
+  name: genie_space
+
+variables:
+  # The "warehouse_id" variable is used to reference the warehouse used by the Genie space.
+  warehouse_id:
+    lookup:
+      # Replace this with the name of your SQL warehouse.
+      warehouse: "Shared Unity Catalog Severless"
+
+  # The title for the Genie space.
+  space_title:
+    default: "NYC Taxi Trip Explorer"
+
+workspace:
+  host: https://myworkspace.databricks.com
+
+resources:
+  jobs:
+    deploy_genie_space:
+      name: "Deploy Genie Space"
+
+      tasks:
+        - task_key: deploy
+          notebook_task:
+            notebook_path: ./src/deploy_genie_space.py
+            base_parameters:
+              warehouse_id: "{{job.parameters.warehouse_id}}"
+              space_title: "{{job.parameters.space_title}}"
+
+      parameters:
+        - name: warehouse_id
+          default: ${var.warehouse_id}
+        - name: space_title
+          default: ${var.space_title}
+
+targets:
+  dev:
+    default: true
+    mode: development
+  prod: {
+    # No overrides
+  }

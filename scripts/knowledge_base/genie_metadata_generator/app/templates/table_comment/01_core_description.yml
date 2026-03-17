@@ -1,0 +1,49 @@
+# Core Description - Universal table understanding
+# Rule 1: Clear definition of what the table represents
+
+description: |
+  Clear, concise description of what this table contains.
+  Focus on WHAT the table is, not HOW to query it.
+  
+  Example: "Customer orders including order details, pricing, shipping, and fulfillment status."
+
+# Rule 15: Appropriate Use Cases (Business Questions)
+business_purpose: |
+  1. What business process does this represent?
+  2. What key business questions is this table designed to answer?
+  
+  Example: "Answers: What is our daily revenue? Who are our active players? What is the churn rate?"
+
+# Rule 9: Table Granularity
+granularity: |
+  Specific grain of the table. 
+  Example: "One row per customer transaction per day."
+
+# Rule 11 & 12: Terminology & Acronyms
+terminology:
+  acronyms: 
+    - term: "GGR"
+      definition: "Gross Gaming Revenue"
+    - term: "UUID"
+      definition: "Universally Unique Identifier"
+  synonyms:
+    - term: "Player"
+      also_known_as: ["Customer", "User", "Punter"]
+      context: "Used interchangeably in Gaming/Sportsbook contexts"
+
+# Rules 25, 26, 27: Domain Specific Context
+# Fill only the section relevant to the table's domain
+domain_context:
+  finance:
+    currency_code: "USD" # Rule 25
+    reporting_period: "Fiscal Month"
+    calculation_methodology: "GAAP"
+  
+  gaming:
+    session_definition: "30 minutes inactivity" # Rule 26
+    event_boundary: "Game start to Game end"
+    settlement_timing: "Immediate vs. Post-match"
+  
+  marketing:
+    attribution_model: "Last Touch" # Rule 27
+    campaign_scope: "North America - Q1"

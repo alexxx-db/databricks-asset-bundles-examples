@@ -1,0 +1,26 @@
+# Minimal job for the default_minimal template.
+# This gives the bundle one deployable resource so that `databricks bundle deploy`
+# and `databricks bundle run` do something. Replace or extend as needed.
+
+resources:
+  jobs:
+    default_minimal_job:
+      name: "default_minimal_job-${bundle.target}"
+
+      parameters:
+        - name: catalog
+          default: ${var.catalog}
+        - name: schema
+          default: ${var.schema}
+
+      tasks:
+        - task_key: minimal_notebook
+          notebook_task:
+            notebook_path: ./src/minimal_notebook.py
+          new_cluster:
+            spark_version: "15.4.x-scala2.12"
+            node_type_id: "i3.xlarge"
+            num_workers: 0
+            spark_conf:
+              spark.databricks.cluster.profile: singleNode
+              master: "local[*]"

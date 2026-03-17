@@ -1,0 +1,27 @@
+# Root bundle fragment: job and variables for deploying Genie spaces.
+# This file is NOT a full bundle by itself (no bundle name, workspace, or targets).
+# Use it by including it from a bundle that has a databricks.yml, for example:
+#   include:
+#     - ../bundle.yml
+# when running from a subdirectory, or copy its contents into your own bundle.
+# To run: set workspace host and targets in your databricks.yml, then
+#   databricks bundle deploy --target <target>
+#   databricks bundle run deploy_genie_spaces
+#
+resources:
+  jobs:
+    deploy_genie_spaces:
+      name: "deploy-genie-spaces-${bundle.target}"
+      tasks:
+        - task_key: upsert_genie_space
+          python_wheel_task:  # more production-ready
+            package_name: deployment
+            entry_point: deploy_genie_space
+          environment:
+            WAREHOUSE_ID: ${bundle.variables.warehouse_id}
+            TARGET_CATALOG: ${bundle.variables.target_catalog}
+            GENIE_SPACE_CONFIG_PATH: genie_spaces/billing_assistant.json
+
+variables:
+  warehouse_id: ""
+  target_catalog: ""

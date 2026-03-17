@@ -1,0 +1,47 @@
+# Lightweight CI: validate bundle YAML and configuration for representative bundles.
+# Catches broken includes, invalid resource refs, and schema issues.
+# Validate runs with a placeholder host so no workspace auth is required.
+
+name: bundle-validate
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+  merge_group:
+    types: [checks_requested]
+  push:
+    branches: [main, master]
+
+jobs:
+  validate:
+    runs-on:
+      group: databricks-protected-runner-group
+      labels: linux-ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        bundle_dir:
+          - default_minimal
+          - default_python
+          - default_sql
+          - knowledge_base/alerts
+          - knowledge_base/iceberg_catalog
+          - knowledge_base/genie_metadata_generator
+          - knowledge_base/job_with_run_job_tasks
+          - knowledge_base/pipeline_with_schema
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Install Databricks CLI
+        uses: databricks/setup-cli@main
+
+      - name: Validate bundle ${{ matrix.bundle_dir }}
+        run: |
+          cd "${{ matrix.bundle_dir }}"
+          databricks bundle validate -t dev
+        env:
+          # Placeholder host so validate runs without workspace auth (config-only check)
+          DATABRICKS_HOST: https://placeholder.databricks.com

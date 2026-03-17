@@ -1,0 +1,73 @@
+# job_table_update_trigger
+
+This example demonstrates a workflow when producers write to Unity Catalog tables, consumers can trigger on table updates instead of time‑based schedules.
+
+
+The Lakeflow Job is configured with:
+- **Table update trigger**: To run a job when new data is ready without the need for a continuously running cluster or knowledge of the processes that update a table.
+- **Configurable wait times**: 
+  - Minimum time between triggers: 0 seconds
+  - Wait after last file change: 3600 seconds
+- **Automatic processing**: When updates are detected, the job automatically runs and processes them
+
+* `src/`: Notebook source code for this project.
+  * `src/assets/consume_table.py`: 
+* `resources/`:  Resource configurations (jobs, pipelines, etc.)
+  * `resources/table_update.py`: job with table update trigger configuration.
+
+## Documentation
+
+For more information about table update triggers, see:
+- [Trigger jobs when source tables are updated](https://docs.databricks.com/aws/en/jobs/trigger-table-update)
+- [Automating jobs with schedules and triggers](https://docs.databricks.com/en/jobs/triggers.html)
+
+## Getting started
+
+Choose how you want to work on this project:
+
+(a) Directly in your Databricks workspace, see
+    https://docs.databricks.com/dev-tools/bundles/workspace.
+
+(b) Locally with an IDE like Cursor or VS Code, see
+    https://docs.databricks.com/vscode-ext.
+
+(c) With command line tools, see https://docs.databricks.com/dev-tools/cli/databricks-cli.html
+
+If you're developing with an IDE, dependencies for this project should be installed using uv:
+
+*  Make sure you have the UV package manager installed.
+   It's an alternative to tools like pip: https://docs.astral.sh/uv/getting-started/installation/.
+*  Run `uv sync --dev` to install the project's dependencies.
+
+
+# Using this project using the CLI
+
+The Databricks workspace and IDE extensions provide a graphical interface for working
+with this project. It's also possible to interact with it directly using the CLI:
+
+1. Authenticate to your Databricks workspace, if you have not done so already:
+    ```
+    $ databricks configure
+    ```
+
+2. To deploy a development copy of this project, type:
+    ```
+    $ databricks bundle deploy --target dev
+    ```
+    (Note that "dev" is the default target, so the `--target` parameter
+    is optional here.)
+
+    This deploys everything that's defined for this project.
+    For example, this project will deploy a job called
+    `[dev yourname] table_update_example` to your workspace.
+    You can find that resource by opening your workspace and clicking on **Jobs & Pipelines**.
+
+3. Development vs. Production behavior
+   - Dev target (mode: development): Schedules and automatic triggers are disabled by design, so the job will not auto-fire on file arrival. Use manual runs to test the logic. 
+     You can also manually run it with:
+
+     ```
+     $ databricks bundle run table_update_example
+     ```
+   - Prod target (mode: production): Automatic triggers are active. Updates to the configured Unity Catalog table will trigger the job run when the trigger evaluates.
+   

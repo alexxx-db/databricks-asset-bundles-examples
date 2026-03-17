@@ -1,0 +1,87 @@
+# databricks.yml — Genie Space Full Lifecycle Bundle
+#
+# Demonstrates the complete Genie Space management pattern:
+#   1. deploy_genie_space    — create or update a space from a serialized JSON config
+#   2. sync_genie_space      — read live SME edits back from the workspace to git
+#   3. genie_qa_reviewer app — Streamlit app to inspect any conversation with full
+#                              unredacted results under the app's SP identity
+#   4. set_genie_permissions — grant CAN_READ / CAN_MANAGE to groups via API workaround
+#
+# WHY jobs instead of native resources:
+#   Genie Spaces are NOT a native DAB resource type (as of CLI 0.263+). The only
+#   supported workaround is a notebook job task that calls the Genie Management API
+#   (w.genie.create_space / update_space). State is persisted in a workspace file
+#   OUTSIDE the bundle sync directory so `bundle deploy` does not remove it.
+#
+# Usage:
+#   databricks bundle deploy --target dev
+#   databricks bundle run deploy_genie_space
+#   databricks bundle run sync_genie_space -p space_name=echostar_finops -p create_review=true
+#
+# DABs known limitations patched here:
+#   - presets.name_prefix NOT applied to Apps; workaround: embed ${bundle.target} in app name
+#   - tags on App resources silently dropped; workaround: tag Jobs/Pipelines instead
+#   - Genie API slug is `genie` (not `genie-spaces`); permissions path:
+#     /api/2.0/permissions/genie/{space_id}
+
+bundle:
+  name: genie_space_full
+
+include:
+  - resources/*.yml
+
+variables:
+  warehouse_id:
+    lookup:
+      warehouse: "Shared Unity Catalog Serverless"
+
+  space_title:
+    default: "EchoStar FinOps Explorer"
+
+  # Set via: databricks bundle deploy --var space_id=<id>
+  # Populated automatically after first deploy_genie_space run.
+  space_id:
+    default: ""
+
+  uc_catalog:
+    default: "echostar_db_iceberg"
+  uc_schema:
+    default: "finops"
+
+  # Sync job git config — override in target or pass via -p
+  git_provider:
+    default: "github"
+  git_repo:
+    default: "your-org/echostar-databricks"
+  git_branch:
+    default: "main"
+  git_base_url:
+    default: "https://gitlab.com"
+  git_secret_scope:
+    default: "git"
+  git_secret_key:
+    default: "pat"
+
+  # Permissions: comma-separated groups to grant CAN_READ
+  read_groups:
+    default: "data-consumers,finops-team"
+  # Comma-separated groups to grant CAN_MANAGE
+  manage_groups:
+    default: "data-platform"
+
+workspace:
+  host: https://myworkspace.databricks.com
+
+targets:
+  dev:
+    default: true
+    mode: development
+    variables:
+      space_title: "EchoStar FinOps Explorer (dev)"
+      uc_catalog: "echostar_db_iceberg_dev"
+
+  prod:
+    run_as:
+      service_principal_name: genie-deploy-svc
+    variables:
+      space_title: "EchoStar FinOps Explorer"

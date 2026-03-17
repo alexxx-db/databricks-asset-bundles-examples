@@ -1,0 +1,36 @@
+# EXAMPLE SQL QUERIES - Teach Genie complex patterns
+# These go into Genie Example SQL tab
+# Use for multi-table queries and complex logic
+# Reference: https://docs.databricks.com/aws/en/genie/best-practices
+
+example_queries:
+  - prompt: "Natural language question a user might ask"
+    description: "What this query demonstrates"
+    sql: |
+      SELECT 
+        column1,
+        column2,
+        AGG_FUNCTION(column3) as metric
+      FROM schema.table
+      WHERE condition
+      GROUP BY column1, column2
+      ORDER BY metric DESC
+    category: "query_category"
+
+# Examples of categories: time_series, customer_analysis, product_analysis, operational, aggregation
+
+# Example:
+#  - prompt: "Show me daily revenue for the last 30 days"
+#    description: "Daily revenue trend with order counts"
+#    sql: |
+#      SELECT 
+#        DATE(order_date) as date,
+#        SUM(total_amount) as revenue,
+#        COUNT(DISTINCT order_id) as order_count,
+#        SUM(total_amount) / COUNT(DISTINCT order_id) as avg_order_value
+#      FROM main.sales.orders
+#      WHERE order_status = 'DELIVERED'
+#        AND order_date >= CURRENT_DATE - INTERVAL 30 DAYS
+#      GROUP BY DATE(order_date)
+#      ORDER BY date DESC
+#    category: "time_series"

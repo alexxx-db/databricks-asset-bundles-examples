@@ -1,0 +1,41 @@
+# SQL EXPRESSIONS - Reusable business metrics for this space
+# These go into Genie Knowledge Store
+# PRIORITY: Define these first - most important!
+# Reference: https://docs.databricks.com/aws/en/genie/best-practices
+
+sql_expressions:
+  # Key Metrics - Define important business metrics
+  - name: "metric_name"
+    sql: "SQL expression for this metric"
+    description: "What this metric represents"
+    category: "metric"
+  
+  # Example:
+  #  - name: "revenue"
+  #    sql: "SUM(CASE WHEN order_status = 'DELIVERED' THEN total_amount ELSE 0 END)"
+  #    description: "Total recognized revenue (delivered orders only)"
+  #    category: "metric"
+  
+  # Filters - Define reusable filter conditions
+  - name: "filter_name"
+    sql: "SQL condition for this filter"
+    description: "What this filter does"
+    category: "filter"
+  
+  # Example:
+  #  - name: "valid_orders"
+  #    sql: "order_status NOT IN ('TEST', 'CANCELLED', 'FRAUD') AND order_id NOT LIKE 'TEST-%'"
+  #    description: "Exclude test, cancelled, and fraud orders"
+  #    category: "filter"
+  
+  # Time Dimensions - Define time-based filters
+  - name: "time_dimension_name"
+    sql: "SQL condition for time filtering"
+    description: "What time period this represents"
+    category: "filter"
+  
+  # Example:
+  #  - name: "recent"
+  #    sql: "order_date >= CURRENT_DATE - INTERVAL 90 DAYS"
+  #    description: "Last 90 days of data"
+  #    category: "filter"

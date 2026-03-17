@@ -1,0 +1,145 @@
+resources:
+  jobs:
+    # ── Deploy job ──────────────────────────────────────────────────────────────
+    # Creates the space on first run; updates it on subsequent runs.
+    # State (space_id) is persisted outside the bundle sync dir.
+    deploy_genie_space:
+      name: "genie-space-full-deploy-${bundle.target}"
+      description: >
+        Deploys the EchoStar FinOps Genie Space from the serialized JSON config.
+        Creates on first run; updates in-place on subsequent runs using the space
+        ID stored in a workspace-side state file.
+      tags:
+        team: platform
+        workstream: governance
+
+      tasks:
+        - task_key: deploy
+          notebook_task:
+            notebook_path: ./src/deploy_genie_space.py
+            base_parameters:
+              warehouse_id: "{{job.parameters.warehouse_id}}"
+              space_title:  "{{job.parameters.space_title}}"
+              space_config: "{{job.parameters.space_config}}"
+
+      parameters:
+        - name: warehouse_id
+          default: ${var.warehouse_id}
+        - name: space_title
+          default: ${var.space_title}
+        - name: space_config
+          default: "echostar_finops"   # stem under genie_spaces/
+
+    # ── Sync job ────────────────────────────────────────────────────────────────
+    # Reads the live workspace state back to git after SMEs edit in the UI.
+    # Supports both GitHub and GitLab.  Set create_review=true to open a PR/MR.
+    sync_genie_space:
+      name: "genie-space-full-sync-${bundle.target}"
+      description: >
+        Reads the live serialized Genie space definition from the workspace API
+        and commits it back to the git repository. Prevents deploy from
+        overwriting SME edits made in the Databricks UI.
+      tags:
+        team: platform
+        workstream: governance
+
+      # Uncomment to schedule nightly sync to catch daily SME edits.
+      # schedule:
+      #   quartz_cron_expression: "0 0 2 * * ?"
+      #   timezone_id: "America/Denver"
+
+      tasks:
+        - task_key: sync
+          notebook_task:
+            notebook_path: ./src/sync_genie_space.py
+            base_parameters:
+              space_name:    "{{job.parameters.space_name}}"
+              space_title:   "{{job.parameters.space_title}}"
+              git_provider:  "{{job.parameters.git_provider}}"
+              git_repo:      "{{job.parameters.git_repo}}"
+              git_branch:    "{{job.parameters.git_branch}}"
+              git_base_url:  "{{job.parameters.git_base_url}}"
+              secret_scope:  "{{job.parameters.secret_scope}}"
+              secret_key:    "{{job.parameters.secret_key}}"
+              create_review: "{{job.parameters.create_review}}"
+
+      parameters:
+        - name: space_name
+          default: "echostar_finops"
+        - name: space_title
+          default: ${var.space_title}
+        - name: git_provider
+          default: ${var.git_provider}
+        - name: git_repo
+          default: ${var.git_repo}
+        - name: git_branch
+          default: ${var.git_branch}
+        - name: git_base_url
+          default: ${var.git_base_url}
+        - name: secret_scope
+          default: ${var.git_secret_scope}
+        - name: secret_key
+          default: ${var.git_secret_key}
+        - name: create_review
+          default: "false"
+
+    # ── Permissions job ─────────────────────────────────────────────────────────
+    # Genie space permissions are NOT manageable via DABs natively.
+    # This job calls /api/2.0/permissions/genie/{space_id} to grant ACLs.
+    # Valid levels: CAN_READ, CAN_RUN, CAN_EDIT, CAN_MANAGE.
+    set_genie_permissions:
+      name: "genie-space-full-permissions-${bundle.target}"
+      description: >
+        Applies Unity-Catalog-style ACLs to the deployed Genie space via the
+        permissions REST API.  Run once after deploy_genie_space completes.
+        Correct API slug: `genie` (not `genie-spaces`).
+      tags:
+        team: platform
+        workstream: governance
+
+      tasks:
+        - task_key: set_permissions
+          notebook_task:
+            notebook_path: ./src/set_genie_permissions.py
+            base_parameters:
+              space_id:      "{{job.parameters.space_id}}"
+              read_groups:   "{{job.parameters.read_groups}}"
+              manage_groups: "{{job.parameters.manage_groups}}"
+
+      parameters:
+        - name: space_id
+          default: ${var.space_id}
+        - name: read_groups
+          default: ${var.read_groups}
+        - name: manage_groups
+          default: ${var.manage_groups}
+
+  apps:
+    # ── QA Reviewer app ─────────────────────────────────────────────────────────
+    # Streamlit app that re-executes any conversation's SQL under the app SP
+    # identity, bypassing the per-user result redaction in the native Monitoring tab.
+    #
+    # IMPORTANT (DABs bug): presets.name_prefix is NOT applied to Apps resources.
+    # See GitHub #3131 (closed "not planned"). Workaround: embed ${bundle.target}
+    # directly in the name field.
+    #
+    # IMPORTANT: `tags` on App resource type are silently dropped by DABs.
+    # The Apps REST API does not support tags. Tag Jobs/Pipelines instead.
+    genie_qa_reviewer:
+      name: "genie-qa-reviewer-${bundle.target}"
+      description: >
+        Lets the Genie space owner view full (unredacted) query results for any
+        conversation. Queries system.access.audit to list conversations and
+        re-executes SQL under the app's service-principal identity.
+
+      source_code_path: ./app
+
+      environment:
+        - name: GENIE_SPACE_ID
+          value: ${var.space_id}
+        - name: WAREHOUSE_ID
+          value: ${var.warehouse_id}
+        - name: UC_CATALOG
+          value: ${var.uc_catalog}
+        - name: UC_SCHEMA
+          value: ${var.uc_schema}

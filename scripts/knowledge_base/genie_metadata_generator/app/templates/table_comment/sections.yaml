@@ -1,0 +1,35 @@
+template_type: table_comment
+base_prompt: prompts/table_comment_prompt.md
+template_dir: templates/table_comment
+
+sections:
+  - key: core_description
+    name: "Core Description"
+    file: 01_core_description.yml
+    description: "Table definition, synonyms, and domain context"
+    prompt_focus: "Define the table, expanding acronyms and synonyms. Identify the specific domain (Gaming, Finance, Marketing)."
+
+  - key: relationships
+    name: "Relationships & Analysis"
+    file: 02_relationships.yml
+    description: "Joins, grain, and analysis guides"
+    prompt_focus: "Map foreign keys, define the grain, and suggest column pairings for analysis."
+
+  - key: data_quality
+    name: "Quality & Warnings"
+    file: 03_data_quality.yml
+    description: "validation, warnings, and edge cases"
+    prompt_focus: "Identify analytical warnings (what NOT to do), edge cases, and known limitations."
+
+  - key: column_details
+    name: "Key Column Logic"
+    file: 05_column_details.yml
+    description: "Complex logic for IDs, Flags, and Enums"
+    prompt_focus: "Detail logic for status flags, calculated columns, and specific enum values."
+
+  - key: metadata
+    name: "Lineage & History"
+    file: 04_metadata.yml
+    description: "Source system, ownership, and history"
+    prompt_focus: "Trace upstream data sources, update frequency, and ownership."
+    optional: true
