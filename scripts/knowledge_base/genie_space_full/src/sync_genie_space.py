@@ -203,6 +203,7 @@ class GitHubClient:
             self._url(f"/contents/{path}"),
             params={"ref": branch},
             headers=self.headers,
+            timeout=30,
         )
         if resp.status_code == 404:
             return None
@@ -219,19 +220,20 @@ class GitHubClient:
         }
         if existing_sha:
             body["sha"] = existing_sha
-        resp = requests.put(self._url(f"/contents/{path}"), headers=self.headers, json=body)
+        resp = requests.put(self._url(f"/contents/{path}"), headers=self.headers, json=body, timeout=30)
         data = self._check(resp, f"push_file({path})")
         return data["commit"]["sha"]
 
     def create_branch(self, new_branch: str, from_branch: str) -> None:
         """Create new_branch pointing at the HEAD of from_branch."""
         # Resolve from_branch HEAD SHA.
-        resp = requests.get(self._url(f"/git/ref/heads/{from_branch}"), headers=self.headers)
+        resp = requests.get(self._url(f"/git/ref/heads/{from_branch}"), headers=self.headers, timeout=30)
         base_sha = self._check(resp, f"resolve_branch({from_branch})")["object"]["sha"]
         resp = requests.post(
             self._url("/git/refs"),
             headers=self.headers,
             json={"ref": f"refs/heads/{new_branch}", "sha": base_sha},
+            timeout=30,
         )
         self._check(resp, f"create_branch({new_branch})")
 
@@ -241,6 +243,7 @@ class GitHubClient:
             self._url("/pulls"),
             headers=self.headers,
             json={"title": title, "body": body, "head": head, "base": base},
+            timeout=30,
         )
         data = self._check(resp, "open_pr")
         return data["html_url"]
@@ -272,6 +275,7 @@ class GitLabClient:
             self._url(f"/repository/files/{urllib.parse.quote(path, safe='')}"),
             params={"ref": branch},
             headers=self.headers,
+            timeout=30,
         )
         if resp.status_code == 404:
             return None
@@ -292,6 +296,7 @@ class GitLabClient:
                 "commit_message": message,
                 "encoding": "text",
             },
+            timeout=30,
         )
         data = self._check(resp, f"push_file({path})")
         return data.get("id", "")  # GitLab returns the file path, not commit SHA here
@@ -302,6 +307,7 @@ class GitLabClient:
             self._url("/repository/branches"),
             headers=self.headers,
             json={"branch": new_branch, "ref": from_branch},
+            timeout=30,
         )
         self._check(resp, f"create_branch({new_branch})")
 
@@ -317,6 +323,7 @@ class GitLabClient:
                 "description": description,
                 "remove_source_branch": True,
             },
+            timeout=30,
         )
         data = self._check(resp, "open_mr")
         return data["web_url"]

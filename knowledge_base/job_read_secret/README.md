@@ -4,6 +4,8 @@ This example demonstrates how to define a secret scope and a job with a task tha
 
 It includes and deploys an example secret scope, and a job with a task in a bundle that reads a secret from the secret scope to a Databricks workspace.
 
+**Required secrets:** Create a secret scope (the bundle can deploy one, or use an existing scope) and store the value under key `example-key` before running the job. Never commit credentials to the repo.
+
 For more information about Databricks secrets, see the [documentation](https://docs.databricks.com/aws/en/security/secrets).
 
 ## Prerequisites

@@ -2,6 +2,10 @@
 
 Canonical scripts for maintaining this repo. Run from the **repository root** unless noted.
 
+## Relationship to repo root
+
+Some directories under `scripts/` (e.g. `knowledge_base/`, `contrib/`) mirror or duplicate structure from the repository root. They are used by tooling such as `update_from_templates.sh` or by CI that may run from different working directories. **The canonical source for bundle examples is at the repository root** (e.g. `knowledge_base/`, `default_python/`). When editing examples or fixing bugs, prefer changing files at the root; keep the `scripts/` mirror in sync when the same content is maintained in both places (see main [README](../README.md) and [CONTRIBUTING.md](../CONTRIBUTING.md)).
+
 ## update_from_templates.sh
 
 Regenerates template-generated bundle directories using `databricks bundle init`.
