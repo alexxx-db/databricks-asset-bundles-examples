@@ -73,9 +73,9 @@ CI runs `yamllint`, Python syntax checks (`py_compile`), and `databricks bundle 
 
 ### Running tests
 
-- **genie_metadata_generator** (SQL identifiers and comment SQL):
+- **genie_metadata_generator** (SQL identifiers, comment SQL, Lakebase backend when streamlit installed):
   ```bash
-  PYTHONPATH=knowledge_base/genie_metadata_generator python -m pytest knowledge_base/genie_metadata_generator/tests/test_sql_identifiers.py knowledge_base/genie_metadata_generator/tests/test_comment_sql.py -v
+  PYTHONPATH=knowledge_base/genie_metadata_generator python -m pytest knowledge_base/genie_metadata_generator/tests/test_sql_identifiers.py knowledge_base/genie_metadata_generator/tests/test_comment_sql.py knowledge_base/genie_metadata_generator/tests/test_lakebase_backend.py -v
   ```
 - **add_asset.py (contrib/data_engineering):**
   ```bash

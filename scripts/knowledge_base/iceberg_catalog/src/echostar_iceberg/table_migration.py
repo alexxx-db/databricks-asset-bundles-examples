@@ -195,13 +195,13 @@ class IcebergTableRegistrar:
     def _is_registered_in_snowflake(
         self, conn: snowflake.connector.SnowflakeConnection, namespace: str, table: str
     ) -> bool:
-        cur = conn.cursor()
-        cur.execute(f"""
-            SELECT COUNT(*) FROM {self._sf_polaris_catalog}.INFORMATION_SCHEMA.TABLES
-            WHERE TABLE_SCHEMA = UPPER('{namespace}')
-              AND TABLE_NAME   = UPPER('{table}')
-        """)
-        return cur.fetchone()[0] > 0
+        with conn.cursor() as cur:
+            cur.execute(f"""
+                SELECT COUNT(*) FROM {self._sf_polaris_catalog}.INFORMATION_SCHEMA.TABLES
+                WHERE TABLE_SCHEMA = UPPER('{namespace}')
+                  AND TABLE_NAME   = UPPER('{table}')
+            """)
+            return cur.fetchone()[0] > 0
 
     def register_or_refresh_in_snowflake(self, loc: TableLocation) -> None:
         """
@@ -232,8 +232,8 @@ class IcebergTableRegistrar:
                   METADATA_FILE_PATH = '{loc.metadata_location}'
             """
 
-        cur = conn.cursor()
-        cur.execute(sql)
+        with conn.cursor() as cur:
+            cur.execute(sql)
         logger.info("Snowflake registration/refresh complete for %s → %s", fqsf, loc.metadata_location)
         conn.close()
 

@@ -90,44 +90,43 @@ def _get_table_statistics(connection, full_name, catalog, schema, table):
         Dict with table-level stats
     """
     stats = {}
-    cursor = connection.cursor()
-    
-    try:
-        # Try DESCRIBE DETAIL (works for Delta tables)
-        cursor.execute(f"DESCRIBE DETAIL {full_name}")
-        detail = cursor.fetchone()
-        
-        if detail:
-            # Extract relevant fields (column order may vary)
-            col_names = [desc[0].lower() for desc in cursor.description]
-            detail_dict = dict(zip(col_names, detail))
-            
-            stats["format"] = detail_dict.get("format", "UNKNOWN")
-            stats["row_count"] = detail_dict.get("numrows") or detail_dict.get("num_rows")
-            stats["size_bytes"] = detail_dict.get("sizeinbytes") or detail_dict.get("size_bytes")
-            stats["num_files"] = detail_dict.get("numfiles") or detail_dict.get("num_files")
-            stats["last_modified"] = detail_dict.get("lastmodified") or detail_dict.get("last_modified")
-            stats["partition_columns"] = detail_dict.get("partitioncolumns") or detail_dict.get("partition_columns")
-            
-            # Format size for readability
-            if stats["size_bytes"]:
-                stats["size_readable"] = _format_bytes(stats["size_bytes"])
-                
-    except Exception as e:
-        # DESCRIBE DETAIL might not work for non-Delta tables
-        logger.warning(f"Could not get detailed table stats: {e}")
-        stats["errors"] = stats.get("errors", []) + [f"DESCRIBE DETAIL failed: {str(e)}"]
-    
-    # Fallback: Get row count if not available
-    if not stats.get("row_count"):
+    with connection.cursor() as cursor:
         try:
-            cursor.execute(f"SELECT COUNT(*) FROM {full_name}")
-            stats["row_count"] = cursor.fetchone()[0]
+            # Try DESCRIBE DETAIL (works for Delta tables)
+            cursor.execute(f"DESCRIBE DETAIL {full_name}")
+            detail = cursor.fetchone()
+
+            if detail:
+                # Extract relevant fields (column order may vary)
+                col_names = [desc[0].lower() for desc in cursor.description]
+                detail_dict = dict(zip(col_names, detail))
+                
+                stats["format"] = detail_dict.get("format", "UNKNOWN")
+                stats["row_count"] = detail_dict.get("numrows") or detail_dict.get("num_rows")
+                stats["size_bytes"] = detail_dict.get("sizeinbytes") or detail_dict.get("size_bytes")
+                stats["num_files"] = detail_dict.get("numfiles") or detail_dict.get("num_files")
+                stats["last_modified"] = detail_dict.get("lastmodified") or detail_dict.get("last_modified")
+                stats["partition_columns"] = detail_dict.get("partitioncolumns") or detail_dict.get("partition_columns")
+                
+                # Format size for readability
+                if stats["size_bytes"]:
+                    stats["size_readable"] = _format_bytes(stats["size_bytes"])
+                    
         except Exception as e:
-            logger.warning(f"Could not get row count: {e}")
-            stats["errors"] = stats.get("errors", []) + [f"Row count failed: {str(e)}"]
-            stats["row_count"] = None
+            # DESCRIBE DETAIL might not work for non-Delta tables
+            logger.warning(f"Could not get detailed table stats: {e}")
+            stats["errors"] = stats.get("errors", []) + [f"DESCRIBE DETAIL failed: {str(e)}"]
     
+        # Fallback: Get row count if not available
+        if not stats.get("row_count"):
+            try:
+                cursor.execute(f"SELECT COUNT(*) FROM {full_name}")
+                stats["row_count"] = cursor.fetchone()[0]
+            except Exception as e:
+                logger.warning(f"Could not get row count: {e}")
+                stats["errors"] = stats.get("errors", []) + [f"Row count failed: {str(e)}"]
+                stats["row_count"] = None
+
     return stats
 
 
@@ -145,45 +144,45 @@ def _profile_column(connection, full_name, column_name, data_type, total_rows):
     Returns:
         Dict with column statistics
     """
-    cursor = connection.cursor()
     data_type_lower = data_type.lower()
     profile = {
         "type": data_type,
         "stats": {}
     }
-    
-    try:
-        # Get null percentage (works for all types)
-        cursor.execute(f"""
-            SELECT 
-                COUNT(*) as total_count,
-                SUM(CASE WHEN `{column_name}` IS NULL THEN 1 ELSE 0 END) as null_count
-            FROM {full_name}
-        """)
-        result = cursor.fetchone()
-        if result:
-            total_count = result[0]
-            null_count = result[1]
-            if total_count > 0:
-                profile["stats"]["null_percentage"] = round((null_count / total_count) * 100, 2)
-                profile["stats"]["completeness"] = round(((total_count - null_count) / total_count) * 100, 2)
-        
-        # Type-specific profiling
-        if any(t in data_type_lower for t in ['string', 'varchar', 'char']):
-            profile["stats"].update(_profile_string_column(cursor, full_name, column_name, total_rows))
-        
-        elif any(t in data_type_lower for t in ['int', 'long', 'bigint', 'double', 'float', 'decimal', 'numeric']):
-            profile["stats"].update(_profile_numeric_column(cursor, full_name, column_name))
-        
-        elif any(t in data_type_lower for t in ['date', 'timestamp']):
-            profile["stats"].update(_profile_date_column(cursor, full_name, column_name))
-        
-        elif 'boolean' in data_type_lower:
-            profile["stats"].update(_profile_boolean_column(cursor, full_name, column_name))
-    
-    except Exception as e:
-        profile["stats"]["error"] = f"Profiling failed: {str(e)}"
-    
+
+    with connection.cursor() as cursor:
+        try:
+            # Get null percentage (works for all types)
+            cursor.execute(f"""
+                SELECT 
+                    COUNT(*) as total_count,
+                    SUM(CASE WHEN `{column_name}` IS NULL THEN 1 ELSE 0 END) as null_count
+                FROM {full_name}
+            """)
+            result = cursor.fetchone()
+            if result:
+                total_count = result[0]
+                null_count = result[1]
+                if total_count > 0:
+                    profile["stats"]["null_percentage"] = round((null_count / total_count) * 100, 2)
+                    profile["stats"]["completeness"] = round(((total_count - null_count) / total_count) * 100, 2)
+
+            # Type-specific profiling
+            if any(t in data_type_lower for t in ['string', 'varchar', 'char']):
+                profile["stats"].update(_profile_string_column(cursor, full_name, column_name, total_rows))
+
+            elif any(t in data_type_lower for t in ['int', 'long', 'bigint', 'double', 'float', 'decimal', 'numeric']):
+                profile["stats"].update(_profile_numeric_column(cursor, full_name, column_name))
+
+            elif any(t in data_type_lower for t in ['date', 'timestamp']):
+                profile["stats"].update(_profile_date_column(cursor, full_name, column_name))
+
+            elif 'boolean' in data_type_lower:
+                profile["stats"].update(_profile_boolean_column(cursor, full_name, column_name))
+
+        except Exception as e:
+            profile["stats"]["error"] = f"Profiling failed: {str(e)}"
+
     return profile
 
 
