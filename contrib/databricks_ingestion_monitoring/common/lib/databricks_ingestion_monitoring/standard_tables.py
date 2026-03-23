@@ -1,8 +1,8 @@
-from enum import Enum
 import logging
+from enum import Enum
 from typing import Dict, Optional
 
-from pyspark.sql import SparkSession, DataFrame
+from pyspark.sql import SparkSession
 
 
 class TableType(Enum):
@@ -94,12 +94,12 @@ STANDARD_COLUMN_COMMENTS = {
     "pipeline_run_id": "The unique identifier of a specific pipeline run (update)",
     "pipeline_run_link": "An HTML-formated link to the pipeline run in the current workspace. Useful in dashboards.",
     "table_name": "Fully qualified replication target table name",
-    "latest_state": """The latest known state of the %s pipeline run. Can be one of: 
-        QUEUED, CREATED, WAITING_FOR_RESOURCES, INITIALIZING, RESETTING, SETTING_UP_TABLES, 
+    "latest_state": """The latest known state of the %s pipeline run. Can be one of:
+        QUEUED, CREATED, WAITING_FOR_RESOURCES, INITIALIZING, RESETTING, SETTING_UP_TABLES,
         RUNNING, STOPPING, COMPLETED, FAILED, CANCELED""",
     "state_color": "A helper color associated with the current state of the %s pipeline run",
     "latest_state_with_color": "An HTML-formated string for %s pipeline run state. Useful in dashboards.",
-    "latest_state_level": """An integer that represents higher level of the %s pipeline run state progress 
+    "latest_state_level": """An integer that represents higher level of the %s pipeline run state progress
         or severity if the pipeline run has finished.""",
     "create_time": "Time when the %s pipeline run was created",
     "end_time": "Time when the %s pipeline run finished its execution (entered COMPLETED, FAILED, CANCELED state)",
@@ -108,9 +108,9 @@ STANDARD_COLUMN_COMMENTS = {
     "latest_error_message": "Short description of the latest error (exception) message in the %s pipeline run",
     "latest_error_code": "The error code (if any) of the latest error (exception) in the %s pipeline run",
     "flow_type": "The logical type of the flow in the CDC Connector: 'cdc', 'snapshot', 'cdc_staging'",
-    "latest_table_state": """The latest state of a flow (writing to the target table). Can be: 
+    "latest_table_state": """The latest state of a flow (writing to the target table). Can be:
           QUEUED, STARTING, RUNNING, COMPLETED, FAILED, SKIPPED, STOPPED, IDLE, EXCLUDED""",
-    "latest_table_state_level": """An integer that represents higher level of the table state progress 
+    "latest_table_state_level": """An integer that represents higher level of the table state progress
           or severity if the table processing has finished.""",
     "latest_table_state_color": "A color associated with the latest state",
     "latest_table_state_with_color": "An HTML-formated string with the latest state; useful in dashboards.",
@@ -404,7 +404,7 @@ TABLE_STATUS = MonitoringTable(
         "latest_cdc_changes_time": "The latest time when the CDC changes were applied to the target table",
         "latest_snapshot_changes_time": "The latest time when the snapshot changes were applied to the target table",
         "latest_error_pipeline_run_id": "The pipeline run id with the latest error for the target table",
-        "latest_error_pipeline_run_link": """An HTML-formatted link for the pipeline run with the latest error 
+        "latest_error_pipeline_run_link": """An HTML-formatted link for the pipeline run with the latest error
           for the target table; useful in dashboards""",
         "latest_error_time": STANDARD_COLUMN_COMMENTS["latest_table_error_time"]
         % ("a"),

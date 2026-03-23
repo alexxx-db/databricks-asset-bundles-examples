@@ -4,8 +4,9 @@
 # tests can import them.
 # dlt/spark setup is optional so unit tests (e.g. add_asset) can run without heavy deps.
 import os
-import sys
 import pathlib
+import sys
+
 import pytest
 
 # Dynamically find and add all `assets/*` directories to `sys.path`
@@ -17,10 +18,11 @@ if _assets_dir.exists():
             sys.path.append(resolved_path)
 
 try:
-    import dlt
     import warnings
-    from pyspark.sql import SparkSession
+
+    import dlt
     from databricks.connect import DatabricksSession
+    from pyspark.sql import SparkSession
 
     # For older databricks-connect, work around issues importing SparkSession
     # and errors when SPARK_REMOTE is set.

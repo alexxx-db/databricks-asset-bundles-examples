@@ -227,7 +227,7 @@ section[data-testid="stSidebar"] span {
         padding-left: var(--md-spacing-sm, 8px);
         padding-right: var(--md-spacing-sm, 8px);
     }
-    
+
     .interview-layout {
         height: calc(100vh - 180px);
         gap: var(--spacing-md, 16px);
@@ -240,14 +240,14 @@ section[data-testid="stSidebar"] span {
         padding-left: var(--md-spacing-xs, 4px);
         padding-right: var(--md-spacing-xs, 4px);
     }
-    
+
     /* Stack interview layout vertically on mobile */
     .interview-layout {
         flex-direction: column;
         height: auto;
         min-height: auto;
     }
-    
+
     .interview-pane {
         min-height: 400px;
     }
@@ -258,7 +258,7 @@ section[data-testid="stSidebar"] span {
     .main .block-container {
         padding-bottom: var(--md-spacing-sm, 8px);
     }
-    
+
     /* Reduce expander max-height on mobile */
     [data-testid="stExpander"] details[open] > div {
         max-height: 300px;

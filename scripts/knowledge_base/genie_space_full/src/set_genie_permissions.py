@@ -40,8 +40,6 @@
 
 # COMMAND ----------
 
-import json
-import os
 
 import requests
 from databricks.sdk import WorkspaceClient
@@ -148,5 +146,5 @@ for entry in updated.get("access_control_list", []):
 # COMMAND ----------
 
 space_url = f"{workspace_host}/genie/rooms/{space_id}"
-print(f"\nPermissions applied successfully.")
+print("\nPermissions applied successfully.")
 print(f"Space URL: {space_url}")

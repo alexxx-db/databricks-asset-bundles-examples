@@ -1,6 +1,5 @@
-import dlt
-import sys
 import logging
+import sys
 
 sys.path.append("../../common/lib")
 

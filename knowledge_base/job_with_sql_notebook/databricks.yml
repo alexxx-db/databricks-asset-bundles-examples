@@ -1,6 +1,10 @@
 bundle:
   name: job_with_sql_notebook
 
+targets:
+  dev:
+    default: true
+    mode: development
 
 resources:
   jobs:

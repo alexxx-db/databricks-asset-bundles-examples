@@ -39,10 +39,8 @@
 # COMMAND ----------
 
 import base64
-import hashlib
 import json
 import os
-import re
 import urllib.parse
 from datetime import datetime, timezone
 from typing import Optional
@@ -109,7 +107,7 @@ except FileNotFoundError:
         f"State file not found: {state_file}\n"
         "Has this space been deployed at least once by deploy_genie_space.py?\n"
         "If so, check that space_title matches the value used at deploy time."
-    )
+    ) from None
 
 # COMMAND ----------
 
@@ -134,7 +132,7 @@ if not space.serialized_space:
 try:
     json.loads(space.serialized_space)
 except json.JSONDecodeError as e:
-    raise RuntimeError(f"serialized_space is not valid JSON: {e}")
+    raise RuntimeError(f"serialized_space is not valid JSON: {e}") from e
 
 print(f"Fetched space: '{space.title}'  ({len(space.serialized_space)} bytes)")
 
@@ -452,6 +450,6 @@ print()
 print("Next steps:")
 if create_review:
     print(f"  1. Review and merge the PR/MR at: {review_url}")
-    print(f"  2. After merge, run the deploy job to push changes to other targets.")
+    print("  2. After merge, run the deploy job to push changes to other targets.")
 else:
-    print(f"  1. Run the deploy job to push this config to other targets if needed.")
+    print("  1. Run the deploy job to push this config to other targets if needed.")

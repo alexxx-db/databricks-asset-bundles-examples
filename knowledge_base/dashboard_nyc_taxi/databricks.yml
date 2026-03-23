@@ -9,7 +9,7 @@ variables:
   warehouse_id:
     lookup:
       # Replace this with the name of your SQL warehouse.
-      warehouse: "Shared Unity Catalog Severless"
+      warehouse: "Shared Unity Catalog Serverless"
 
 workspace:
   host: https://myworkspace.databricks.com

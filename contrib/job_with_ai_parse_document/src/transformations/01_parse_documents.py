@@ -37,14 +37,14 @@ spark.sql(f"USE SCHEMA {schema}")
 
 # COMMAND ----------
 
-from pyspark.sql.functions import col, current_timestamp, expr
+from pyspark.sql.functions import current_timestamp, expr
 from pyspark.sql.types import (
-    StructType,
-    StructField,
-    StringType,
     BinaryType,
-    TimestampType,
     LongType,
+    StringType,
+    StructField,
+    StructType,
+    TimestampType,
 )
 
 # Define schema for binary files (must match exact schema expected by binaryFile format)

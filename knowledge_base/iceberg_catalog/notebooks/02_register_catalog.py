@@ -11,7 +11,6 @@
 #     - iceberg_db  → MANAGED (Databricks-authored Iceberg on same S3)
 
 from databricks.sdk import WorkspaceClient
-from databricks.sdk.service.catalog import CatalogType
 
 w = WorkspaceClient()
 
@@ -51,7 +50,7 @@ try:
 except Exception:
     c2 = w.catalogs.create(
         name=DB_ICEBERG_CATALOG,
-        storage_root=f"s3://iceberg-lakehouse/iceberg/iceberg_db",
+        storage_root="s3://iceberg-lakehouse/iceberg/iceberg_db",
         comment="Managed Iceberg catalog: Databricks-authored tables, readable by Snowflake",
     )
     print(f"Created managed Iceberg catalog: {c2.full_name}")

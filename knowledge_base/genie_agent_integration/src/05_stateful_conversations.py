@@ -39,8 +39,6 @@ from typing import Any, Dict, Optional
 
 import requests
 from databricks.sdk import WorkspaceClient
-from langchain.agents import AgentType, initialize_agent
-from langchain_community.chat_models import ChatDatabricks
 from langchain_core.tools import BaseTool
 
 # COMMAND ----------

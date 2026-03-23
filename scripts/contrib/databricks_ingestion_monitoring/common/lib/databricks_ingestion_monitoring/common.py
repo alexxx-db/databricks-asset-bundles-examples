@@ -211,7 +211,7 @@ def get_pipeline_ids_by_tags(
                     f"Pipeline tags index is stale (age: {age_hours:.1f} hours > max: {index_max_age_hours} hours)"
                 )
                 if not api_fallback_enabled:
-                    raise ValueError(f"Index is stale and API fallback is disabled")
+                    raise ValueError("Index is stale and API fallback is disabled")
         except Exception as e:
             log.warning(f"Failed to use pipeline tags index: {e}")
             if not api_fallback_enabled:
@@ -277,43 +277,43 @@ def get_required_widget_parameter(widgets, param_name: str):
 
 SDP_EVENT_LOG_SCHEMA = """
     id STRING,
-    sequence STRUCT<data_plane_id: STRUCT<instance: STRING, seq_no: BIGINT>, 
+    sequence STRUCT<data_plane_id: STRUCT<instance: STRING, seq_no: BIGINT>,
                     control_plane_seq_no: BIGINT>,
-    origin STRUCT<cloud: STRING, 
-                  region: STRING, 
-                  org_id: BIGINT, 
-                  user_id: BIGINT, 
-                  pipeline_id: STRING, 
-                  pipeline_type: STRING, 
-                  pipeline_name: STRING, 
-                  cluster_id: STRING, 
-                  update_id: STRING, 
-                  maintenance_id: STRING, 
-                  table_id: STRING, 
-                  table_name: STRING, 
-                  flow_id: STRING, 
-                  flow_name: STRING, 
-                  batch_id: BIGINT, 
-                  request_id: STRING, 
-                  uc_resource_id: STRING, 
-                  dataset_name: STRING, 
-                  sink_name: STRING, 
-                  catalog_name: STRING, 
+    origin STRUCT<cloud: STRING,
+                  region: STRING,
+                  org_id: BIGINT,
+                  user_id: BIGINT,
+                  pipeline_id: STRING,
+                  pipeline_type: STRING,
+                  pipeline_name: STRING,
+                  cluster_id: STRING,
+                  update_id: STRING,
+                  maintenance_id: STRING,
+                  table_id: STRING,
+                  table_name: STRING,
+                  flow_id: STRING,
+                  flow_name: STRING,
+                  batch_id: BIGINT,
+                  request_id: STRING,
+                  uc_resource_id: STRING,
+                  dataset_name: STRING,
+                  sink_name: STRING,
+                  catalog_name: STRING,
                   schema_name: STRING,
-                  materialization_name: STRING, 
-                  operation_id: STRING, 
+                  materialization_name: STRING,
+                  operation_id: STRING,
                   flow_attempt_id: STRING,
                   source_name: STRING,
-                  uc_table_id: STRING, 
-                  ingestion_source_type: STRING, 
+                  uc_table_id: STRING,
+                  ingestion_source_type: STRING,
                   uc_parent_table_id: STRING>,
       timestamp TIMESTAMP,
       message STRING,
       level STRING,
       maturity_level STRING,
-      error STRUCT<fatal: BOOLEAN, 
-                  exceptions: ARRAY<STRUCT<class_name: STRING, 
-                                            message: STRING, 
+      error STRUCT<fatal: BOOLEAN,
+                  exceptions: ARRAY<STRUCT<class_name: STRING,
+                                            message: STRING,
                                             stack: ARRAY<STRUCT<declaring_class: STRING, method_name: STRING, file_name: STRING, line_number: BIGINT>>>>>,
         details STRING,
         event_type STRING
@@ -670,12 +670,11 @@ class DashboardTemplate:
         )
 
     @staticmethod
-    def _extract_dashboard_name_from_path(dasboard_path: str) -> str:
+    def _extract_dashboard_name_from_path(dashboard_path: str) -> str:
         display_name = os.path.basename(dashboard_path).replace(".lvdash.json", "")
         return re.sub(r"\s+Template", "", display_name)
 
     def _get_default_warehouse_id(self):
-        warehouse_name = None
         preferred_warehouse = min(
             [w for w in self.wc.warehouses.list() if w.state == State.RUNNING],
             key=lambda w: f"{'0' if w.enable_serverless_compute else '9'}{w.name}",
@@ -686,7 +685,7 @@ class DashboardTemplate:
             )
             return preferred_warehouse.id
         else:
-            self.log.warn(f"No suitable warehouse found")
+            self.log.warn("No suitable warehouse found")
 
     def _find_all_dashboards_with_name(self, display_name: str):
         dashboard_ids = []

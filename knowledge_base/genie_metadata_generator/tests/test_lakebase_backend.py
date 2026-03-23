@@ -3,9 +3,9 @@
 Requires streamlit (and app deps) to be installed to import the backend; tests are skipped otherwise.
 """
 
-import pytest
 from unittest.mock import MagicMock
 
+import pytest
 from app.utils.sql_identifiers import InvalidIdentifierError
 
 

@@ -12,7 +12,7 @@ from state.db import get_lakebase_connection_safe
 def is_lakebase_connected() -> bool:
     """
     Check if Lakebase is connected (cached for 10 seconds).
-    
+
     Returns:
         True if Lakebase connection is available, False otherwise
     """
@@ -26,10 +26,10 @@ def is_lakebase_connected() -> bool:
 def check_lakebase_available() -> bool:
     """
     Check and show UI feedback if Lakebase unavailable.
-    
+
     Returns:
         True if Lakebase is available, False otherwise
-        
+
     Example:
         >>> if not check_lakebase_available():
         ...     return  # Exit early if Lakebase not available

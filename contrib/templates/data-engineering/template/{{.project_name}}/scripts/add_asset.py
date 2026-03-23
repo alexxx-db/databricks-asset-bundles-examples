@@ -2,20 +2,48 @@
 #
 # add_asset.py is used to initialize a new asset from the data-engineering template.
 #
-import sys
+import shutil
 import subprocess
-from typing import Literal
+import sys
+from typing import List, Literal
 
 VALID_ASSETS = ["etl-pipeline", "job", "ingest-pipeline"]
 AssetType = Literal["etl-pipeline", "job", "ingest-pipeline"]
 
+# Options that may be passed through to `databricks bundle init` (option, requires_value)
+ALLOWED_PASSTHROUGH = frozenset({"--config", "--target"})
+
+
+def _parse_passthrough_args(args: List[str]) -> List[str]:
+    """Parse argv for allowlisted options and their values. Prevents command injection."""
+    result = []
+    i = 0
+    while i < len(args):
+        arg = args[i]
+        if arg in ALLOWED_PASSTHROUGH:
+            result.append(arg)
+            i += 1
+            if i < len(args) and not args[i].startswith("-"):
+                result.append(args[i])
+                i += 1
+        else:
+            i += 1
+    return result
+
 
 def init_bundle(asset_type: AssetType) -> None:
-    cmd = (
-        f"databricks bundle init https://github.com/databricks/bundle-examples --template-dir contrib/templates/data-engineering/assets/{asset_type} "
-        + " ".join(sys.argv[2:])
-    )
-    subprocess.run(cmd, shell=True)
+    databricks = shutil.which("databricks") or "databricks"
+    template_dir = f"contrib/templates/data-engineering/assets/{asset_type}"
+    cmd = [
+        databricks,
+        "bundle",
+        "init",
+        "https://github.com/databricks/bundle-examples",
+        "--template-dir",
+        template_dir,
+    ]
+    cmd.extend(_parse_passthrough_args(sys.argv[2:]))
+    subprocess.run(cmd, shell=False)
 
 
 def show_menu() -> AssetType:
@@ -33,7 +61,7 @@ def show_menu() -> AssetType:
             print("Please enter a number.")
 
 
-def main():
+def main() -> None:
     if len(sys.argv) > 1:
         asset_type = sys.argv[1]
         if asset_type not in VALID_ASSETS:

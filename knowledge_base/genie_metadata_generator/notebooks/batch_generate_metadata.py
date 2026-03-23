@@ -56,11 +56,19 @@ dbutils.widgets.text("output_schema",  "genie_metadata")
 dbutils.widgets.text("genie_space_id", "")
 dbutils.widgets.text("apply_to_genie", "false")
 
-uc_catalog      = dbutils.widgets.get("uc_catalog")
-uc_schema       = dbutils.widgets.get("uc_schema")
+import re
+
+_ID_RE = re.compile(r"^[a-zA-Z0-9_]+$")
+def _validate_id(name, kind="identifier"):
+    if not _ID_RE.match(name):
+        raise ValueError(f"{kind} contains invalid characters: {name!r}")
+    return name
+
+uc_catalog      = _validate_id(dbutils.widgets.get("uc_catalog"), "catalog")
+uc_schema       = _validate_id(dbutils.widgets.get("uc_schema"), "schema")
 table_list_str  = dbutils.widgets.get("table_list")
-output_catalog  = dbutils.widgets.get("output_catalog")
-output_schema   = dbutils.widgets.get("output_schema")
+output_catalog  = _validate_id(dbutils.widgets.get("output_catalog"), "output_catalog")
+output_schema   = _validate_id(dbutils.widgets.get("output_schema"), "output_schema")
 genie_space_id  = dbutils.widgets.get("genie_space_id")
 apply_to_genie  = dbutils.widgets.get("apply_to_genie").lower() == "true"
 
@@ -77,7 +85,7 @@ print(f"apply:       {apply_to_genie} (space: {genie_space_id or 'none'})")
 # Step 1: Discover tables
 # ---------------------------------------------------------------------------
 
-from data.information_schema import get_tables_in_schema, get_table_columns
+from data.information_schema import get_table_columns, get_tables_in_schema
 
 all_tables = get_tables_in_schema(spark, uc_catalog, uc_schema)
 
@@ -95,8 +103,8 @@ if not all_tables:
 # Step 2: Auto-profile each table
 # ---------------------------------------------------------------------------
 
-from data.profiler import get_table_profile
 from config import config
+from data.profiler import get_table_profile
 
 # Establish a SQL connection for profiling
 from databricks import sql as dbsql

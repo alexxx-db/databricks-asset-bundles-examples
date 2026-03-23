@@ -2,9 +2,10 @@
 YAML validation and manipulation utilities.
 Atomic functions for YAML operations across the app.
 """
-import yaml
 import logging
-from typing import Tuple, Optional
+from typing import Optional, Tuple
+
+import yaml
 
 logger = logging.getLogger(__name__)
 
@@ -12,10 +13,10 @@ logger = logging.getLogger(__name__)
 def validate_yaml(yaml_content: str) -> Tuple[bool, Optional[str]]:
     """
     Atomic YAML validation function.
-    
+
     Args:
         yaml_content: YAML string to validate
-    
+
     Returns:
         (is_valid: bool, error: Optional[str])
     """

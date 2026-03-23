@@ -1,7 +1,7 @@
-import dlt
-import sys
 import logging
+import sys
 
+import dlt
 from pyspark.sql import SparkSession
 
 sys.path.append("../../common/lib")
@@ -118,7 +118,7 @@ class CdcConnectorMonitoringEtlPipeline(MonitoringEtlPipeline):
         silver_latest_source_view_name = f"{silver_table_name}_latest_source"
 
         @dlt.view(name=silver_latest_source_view_name)
-        def table_latest_run_processing_state_source():
+        def table_latest_run_state_source():
             return spark.sql(f"""
           SELECT pipeline_id,
                  table_name,
@@ -159,7 +159,7 @@ class CdcConnectorMonitoringEtlPipeline(MonitoringEtlPipeline):
         )
 
         @dlt.view(name=silver_latest_cdc_changes_source_view_name)
-        def table_latest_run_processing_state_source():
+        def table_latest_cdc_changes_source():
             return spark.sql(f"""
           SELECT pipeline_id,
                  table_name,
@@ -183,7 +183,7 @@ class CdcConnectorMonitoringEtlPipeline(MonitoringEtlPipeline):
                  null AS latest_error_flow_type,
                  event_timestamp AS updated_at
           FROM STREAM(`{EVENTS_TABLE_METRICS.name}`)
-          WHERE table_name IS NOT null 
+          WHERE table_name IS NOT null
                 AND num_written_rows > 0
                 AND flow_type='cdc'
             """)
@@ -202,7 +202,7 @@ class CdcConnectorMonitoringEtlPipeline(MonitoringEtlPipeline):
         )
 
         @dlt.view(name=silver_latest_snapshot_changes_source_view_name)
-        def table_latest_run_processing_state_source():
+        def table_latest_snapshot_changes_source():
             return spark.sql(f"""
           SELECT pipeline_id,
                  table_name,
@@ -226,7 +226,7 @@ class CdcConnectorMonitoringEtlPipeline(MonitoringEtlPipeline):
                  null AS latest_error_flow_type,
                  event_timestamp AS updated_at
           FROM STREAM(`{EVENTS_TABLE_METRICS.name}`)
-          WHERE table_name IS NOT null 
+          WHERE table_name IS NOT null
                 AND num_written_rows > 0
                 AND flow_type='snapshot'
             """)
@@ -260,8 +260,8 @@ class CdcConnectorMonitoringEtlPipeline(MonitoringEtlPipeline):
                            sum(ifnull(num_written_rows, 0)) FILTER (WHERE flow_type='{CdcConstants.SNAPSHOT_FLOW_TYPE}') AS latest_pipeline_run_num_written_snapshot_changes
                     FROM {EVENTS_TABLE_METRICS.name}
                     GROUP BY 1, 2, 3
-                  ) AS etm 
-                  ON s.pipeline_id = etm.pipeline_id 
+                  ) AS etm
+                  ON s.pipeline_id = etm.pipeline_id
                      AND s.latest_pipeline_run_id = etm.pipeline_run_id
                      AND s.table_name = etm.table_name
           """)

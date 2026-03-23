@@ -30,10 +30,10 @@ from __future__ import annotations
 import logging
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Optional
 
 from databricks.sdk import WorkspaceClient
-from iceberg_catalog.polaris_client import PolarisClient, IcebergField, IcebergSchema
+
+from iceberg_catalog.polaris_client import IcebergField, IcebergSchema, PolarisClient
 
 logger = logging.getLogger(__name__)
 
@@ -55,8 +55,8 @@ class DriftKind(str, Enum):
 class ColumnDrift:
     column_name:  str
     kind:         DriftKind
-    uc_value:     Optional[str] = None    # type/nullability as seen in UC
-    polaris_value: Optional[str] = None   # type/nullability as seen in Polaris
+    uc_value:     str | None = None    # type/nullability as seen in UC
+    polaris_value: str | None = None   # type/nullability as seen in Polaris
     is_breaking:  bool = False
 
 
@@ -214,7 +214,7 @@ class IcebergSchemaSync:
         uc_catalog:  str,
         uc_schema:   str,
         table:       str,
-        namespace:   Optional[str] = None,   # Polaris namespace; defaults to uc_schema
+        namespace:   str | None = None,   # Polaris namespace; defaults to uc_schema
     ) -> SchemaDrift:
         polaris_ns = namespace or uc_schema
         uc_cols     = self._get_uc_columns(uc_catalog, uc_schema, table)

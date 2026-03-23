@@ -1,4 +1,4 @@
-from dash import html, dcc, dash_table
+from dash import dash_table, dcc, html
 
 
 def make_app_layout():

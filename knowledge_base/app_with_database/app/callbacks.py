@@ -1,6 +1,5 @@
-from dash import Input, Output, State, callback_context
+from dash import Input, Output, State
 from lakebase_connector import get_holiday_requests, update_request_status
-import pandas as pd
 
 
 def register_callbacks(app):

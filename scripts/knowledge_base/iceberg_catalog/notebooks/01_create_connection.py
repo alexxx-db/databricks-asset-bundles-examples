@@ -11,12 +11,11 @@
 # Run with: databricks bundle run setup_connection (after adding to bundle)
 # Or: attach to an interactive cluster and run cell-by-cell.
 
+
 from databricks.sdk import WorkspaceClient
 from databricks.sdk.service.catalog import (
-    SecurableType,
     ConnectionType,
 )
-import os
 
 w = WorkspaceClient()
 
@@ -50,8 +49,8 @@ except Exception:
         options={
             "uri":             POLARIS_REST_URI,
             "token_endpoint":  TOKEN_ENDPOINT,
-            "client_id":       f"{{{{secrets/iceberg-polaris/polaris_client_id}}}}",
-            "client_secret":   f"{{{{secrets/iceberg-polaris/polaris_client_secret}}}}",
+            "client_id":       "{{secrets/iceberg-polaris/polaris_client_id}}",
+            "client_secret":   "{{secrets/iceberg-polaris/polaris_client_secret}}",
             "scope":           f"PRINCIPAL_ROLE:{PRINCIPAL_ROLE}",
         },
         comment="Snowflake Open Catalog (Polaris) Iceberg REST connection",
@@ -67,6 +66,6 @@ try:
     validated = w.connections.get(CONN_NAME)
     print(f"Connection state: {validated.connection_type} — OK")
 except Exception as e:
-    raise RuntimeError(f"Connection validation failed: {e}")
+    raise RuntimeError(f"Connection validation failed: {e}") from e
 
-print(f"\nNext step: run 02_register_catalog.py to create the foreign catalog")
+print("\nNext step: run 02_register_catalog.py to create the foreign catalog")

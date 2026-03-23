@@ -14,8 +14,8 @@ SnowflakeRefreshClient - trigger Snowflake REFRESH for Databricks-written snapsh
 
 from iceberg_catalog.polaris_client import PolarisClient
 from iceberg_catalog.schema_sync import IcebergSchemaSync, SchemaDrift
-from iceberg_catalog.table_migration import IcebergTableRegistrar
 from iceberg_catalog.snowflake_refresh import SnowflakeRefreshClient
+from iceberg_catalog.table_migration import IcebergTableRegistrar
 
 __all__ = [
     "PolarisClient",

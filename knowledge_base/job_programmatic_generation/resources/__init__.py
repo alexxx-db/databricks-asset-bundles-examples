@@ -1,5 +1,5 @@
-import os
 import glob
+import os
 
 from databricks.bundles.core import (
     Bundle,

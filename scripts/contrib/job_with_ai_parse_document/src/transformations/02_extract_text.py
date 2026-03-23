@@ -31,7 +31,7 @@ spark.sql(f"USE SCHEMA {schema}")
 
 # COMMAND ----------
 
-from pyspark.sql.functions import col, concat_ws, expr, lit, when
+from pyspark.sql.functions import concat_ws, expr, lit, when
 
 # Read from source table using Structured Streaming
 parsed_stream = spark.readStream.format("delta").table(source_table_name)

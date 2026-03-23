@@ -4,7 +4,9 @@ This file is in the root since it can be used for tests in any place in this
 project, including tests under resources/.
 """
 
-import os, sys, pathlib
+import os
+import sys
+import pathlib
 from contextlib import contextmanager
 
 
@@ -19,7 +21,7 @@ try:
 except ImportError:
     raise ImportError(
         "Test dependencies not found.\n\nRun tests using 'uv run pytest'. See http://docs.astral.sh/uv to learn more about uv."
-    )
+    ) from None
 
 
 @pytest.fixture()

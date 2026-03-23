@@ -35,7 +35,7 @@ def main():
     # Use environment variables for parameterization (recommended for jobs/wheels/production)
     config_path = os.environ.get("GENIE_SPACE_CONFIG_PATH", "genie_spaces/billing_assistant.json")
     warehouse_id = os.environ.get("WAREHOUSE_ID")
-    target_catalog = os.environ.get("TARGET_CATALOG")  # Unused, but ready for future
+    os.environ.get("TARGET_CATALOG")  # Unused, but ready for future
 
     if not warehouse_id:
         logger.error("WAREHOUSE_ID environment variable must be set.")

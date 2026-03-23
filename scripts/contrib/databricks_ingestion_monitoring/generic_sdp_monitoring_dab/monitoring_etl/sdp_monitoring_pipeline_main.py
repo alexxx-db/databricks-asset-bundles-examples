@@ -1,4 +1,3 @@
-import dlt
 import sys
 import logging
 

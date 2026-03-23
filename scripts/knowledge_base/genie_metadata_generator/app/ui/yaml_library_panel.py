@@ -6,8 +6,6 @@ Material Design styling throughout.
 import logging
 import streamlit as st
 from state import get_state_manager
-from config import config
-from utils.yaml_utils import validate_yaml
 from utils.data_conversion import library_yaml_to_table_data
 from ui.utils.cache import cached_state
 
@@ -22,32 +20,32 @@ def render_library_panel():
     """
     st.markdown("#### :material/library_books: YAML Library")
     st.caption("Your saved YAML configurations for reuse")
-    
+
     from ui.utils.availability import check_lakebase_available, check_library_service_available
-    
+
     # Check if Lakebase is enabled using utility
     if not check_lakebase_available("YAML Library requires Lakebase to be enabled"):
         return
-    
+
     try:
         from state.services import get_library_service
-        
+
         state = get_state_manager()
         library_service = get_library_service(state.user_email)
-        
+
         # Check library service availability using utility
         if not check_library_service_available(library_service):
             return
-        
+
         # Search bar (Material design)
         search = st.text_input(
             "Search YAMLs",
             placeholder="Search by table, catalog, or schema...",
             key="library_search"
         )
-        
+
         st.divider()
-        
+
         # Get all library items (cached for 60 seconds)
         if search:
             all_items = cached_state(
@@ -71,21 +69,21 @@ def render_library_panel():
                 ttl_seconds=60,
                 invalidate_on=['_yaml_saved', '_yaml_deleted']
             )
-        
+
         # Render separate sections
         if not table_items and not genie_items:
             st.info("No YAMLs in library yet", icon=":material/info:")
             st.caption("YAMLs are automatically saved to library when you save progress")
             return
-        
+
         # Table Comments Section
         _render_table_yaml_section(table_items, library_service)
-        
+
         st.divider()
-        
+
         # Genie Spaces Section
         _render_genie_yaml_section(genie_items, library_service)
-            
+
     except Exception as e:
         st.error(f"Error loading library: {str(e)}", icon=":material/error:")
         logger.error(f"Failed to load library: {e}", exc_info=True)
@@ -94,13 +92,13 @@ def render_library_panel():
 def _render_table_yaml_section(table_items: list, library_service):
     """Render Table Comments section with actions."""
     st.markdown("### :material/description: Table Comments")
-    
+
     if not table_items:
         st.caption("_No table comments in library yet_")
         return
-    
+
     st.caption(f"{len(table_items)} table comment(s) saved")
-    
+
     for yaml_item in table_items:
         _render_table_yaml_item(yaml_item, library_service)
 
@@ -108,13 +106,13 @@ def _render_table_yaml_section(table_items: list, library_service):
 def _render_genie_yaml_section(genie_items: list, library_service):
     """Render Genie Spaces section with actions."""
     st.markdown("### :material/auto_awesome: Genie Spaces")
-    
+
     if not genie_items:
         st.caption("_No Genie spaces in library yet_")
         return
-    
+
     st.caption(f"{len(genie_items)} Genie space(s) saved")
-    
+
     for yaml_item in genie_items:
         _render_genie_yaml_item(yaml_item, library_service)
 
@@ -126,10 +124,10 @@ def _render_table_yaml_item(yaml_item: dict, library_service):
         icon=":material/description:"
     ):
         col1, col2 = st.columns([2, 1])
-        
+
         with col1:
             st.caption(f"Saved: {yaml_item['updated_at'][:16] if yaml_item['updated_at'] else 'Unknown'}")
-            
+
             # Tags as Material chips (HTML) - using CSS variables for dark mode support
             if yaml_item.get('tags'):
                 st.markdown("**Tags:**")
@@ -140,7 +138,7 @@ def _render_table_yaml_item(yaml_item: dict, library_service):
                     for tag in yaml_item['tags']
                 ])
                 st.markdown(tags_html, unsafe_allow_html=True)
-        
+
         with col2:
             # Action buttons with Material icons
             if st.button(
@@ -153,7 +151,7 @@ def _render_table_yaml_item(yaml_item: dict, library_service):
                 st.session_state['editor_yaml_id'] = yaml_item['id']
                 st.session_state['selected_page'] = 'Editor'
                 st.rerun()
-            
+
             if st.button(
                 "Re-interview",
                 key=f"reinterview_{yaml_item['id']}",
@@ -162,7 +160,7 @@ def _render_table_yaml_item(yaml_item: dict, library_service):
                 help="Start new interview with this YAML as context"
             ):
                 _handle_reinterview_table(yaml_item)
-            
+
             if st.button(
                 "Edit",
                 key=f"edit_{yaml_item['id']}",
@@ -171,7 +169,7 @@ def _render_table_yaml_item(yaml_item: dict, library_service):
                 help="Edit and update this YAML"
             ):
                 _handle_edit_yaml(yaml_item, library_service)
-            
+
             if st.download_button(
                 "Download",
                 data=yaml_item['yaml_content'],
@@ -182,7 +180,7 @@ def _render_table_yaml_item(yaml_item: dict, library_service):
                 use_container_width=True
             ):
                 st.toast("YAML downloaded", icon=":material/check_circle:")
-            
+
             if st.button(
                 "Delete",
                 key=f"delete_{yaml_item['id']}",
@@ -201,17 +199,17 @@ def _render_genie_yaml_item(yaml_item: dict, library_service):
     """Render a single Genie YAML library item with edit/re-interview actions."""
     metadata = yaml_item.get('metadata', {})
     table_count = metadata.get('table_count', 0) if isinstance(metadata, dict) else 0
-    
+
     with st.expander(
         f"**{yaml_item['table_name']}** - {table_count} tables",
         icon=":material/auto_awesome:"
     ):
         col1, col2 = st.columns([2, 1])
-        
+
         with col1:
             st.caption(f"Saved: {yaml_item['updated_at'][:16] if yaml_item['updated_at'] else 'Unknown'}")
             st.caption(f"Catalog: {yaml_item['catalog']}.{yaml_item['schema']}")
-            
+
             # Tags as Material chips (HTML) - using CSS variables for dark mode support
             if yaml_item.get('tags'):
                 st.markdown("**Tags:**")
@@ -222,7 +220,7 @@ def _render_genie_yaml_item(yaml_item: dict, library_service):
                     for tag in yaml_item['tags']
                 ])
                 st.markdown(tags_html, unsafe_allow_html=True)
-        
+
         with col2:
             # Action buttons with Material icons
             if st.button(
@@ -235,10 +233,10 @@ def _render_genie_yaml_item(yaml_item: dict, library_service):
                 st.session_state['editor_yaml_id'] = yaml_item['id']
                 st.session_state['selected_page'] = 'Editor'
                 st.rerun()
-            
+
             # Note: Re-interview for Genie spaces is not supported directly
             # Users should use "Select from Library" in the Genie page instead
-            
+
             if st.button(
                 "Edit",
                 key=f"edit_{yaml_item['id']}",
@@ -247,7 +245,7 @@ def _render_genie_yaml_item(yaml_item: dict, library_service):
                 help="Edit and update this YAML"
             ):
                 _handle_edit_yaml(yaml_item, library_service)
-            
+
             if st.download_button(
                 "Download",
                 data=yaml_item['yaml_content'],
@@ -258,7 +256,7 @@ def _render_genie_yaml_item(yaml_item: dict, library_service):
                 use_container_width=True
             ):
                 st.toast("YAML downloaded", icon=":material/check_circle:")
-            
+
             if st.button(
                 "Delete",
                 key=f"delete_{yaml_item['id']}",
@@ -276,15 +274,15 @@ def _render_genie_yaml_item(yaml_item: dict, library_service):
 def _handle_reinterview_table(yaml_item: dict):
     """Handle re-interview action for table YAML."""
     state = get_state_manager()
-    
+
     # Convert library YAML to table_data format using utility function
     table_data = library_yaml_to_table_data(yaml_item)
-    
+
     # Set up queue with this table
     state.set_table_queue([table_data])
     state.set_current_table_index(0)
     state.clear_table_interview()  # Clear any existing interview
-    
+
     # Navigate to interview
     state.set_workflow_step('table_interview')
     st.session_state['selected_page'] = 'Document'

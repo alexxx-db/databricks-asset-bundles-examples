@@ -3,17 +3,18 @@ Session context for user identification and session tracking.
 
 Uses HTTP headers forwarded by Databricks Apps reverse proxy:
 - X-Forwarded-Email: User email from IdP
-- X-Forwarded-User: User identifier from IdP  
+- X-Forwarded-User: User identifier from IdP
 - X-Forwarded-Preferred-Username: Username from IdP
 - X-Real-Ip: Client IP address
 - X-Request-Id: Request UUID
 
 See: https://docs.databricks.com/aws/en/dev-tools/databricks-apps/http-headers
 """
+import hashlib
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Optional, Dict
-import hashlib
+from typing import Dict, Optional
+
 import streamlit as st
 
 
@@ -25,11 +26,11 @@ class SessionContext:
     user_id: Optional[str] = None  # X-Forwarded-User
     username: Optional[str] = None  # X-Forwarded-Preferred-Username
     client_ip: Optional[str] = None  # X-Real-Ip
-    
+
     @property
     def session_key(self) -> str:
         """Unique key combining user email and session start time.
-        
+
         Format: {email_hash}_{timestamp}
         This key uniquely identifies a user's session for database storage.
         """
@@ -37,11 +38,11 @@ class SessionContext:
         email_hash = hashlib.sha256(self.user_email.encode()).hexdigest()[:12]
         timestamp = self.session_start.strftime("%Y%m%d_%H%M%S")
         return f"{email_hash}_{timestamp}"
-    
-    @property  
+
+    @property
     def display_name(self) -> str:
         """User-friendly display name.
-        
+
         Priority: username > email prefix > 'anonymous'
         """
         if self.username:
@@ -49,12 +50,12 @@ class SessionContext:
         if self.user_email and "@" in self.user_email:
             return self.user_email.split("@")[0]
         return "anonymous"
-    
+
     @property
     def is_authenticated(self) -> bool:
         """Check if user is authenticated (not local/anonymous)."""
         return self.user_email != "anonymous@local"
-    
+
     def to_dict(self) -> dict:
         """Serialize for storage/logging."""
         return {
@@ -77,7 +78,7 @@ def _get_header(headers: Dict, name: str) -> Optional[str]:
 def get_databricks_headers() -> Dict[str, Optional[str]]:
     """
     Get all Databricks Apps forwarded headers.
-    
+
     Available headers (per Databricks docs):
     - X-Forwarded-Host: Original host/domain
     - X-Forwarded-Preferred-Username: Username from IdP
@@ -85,7 +86,7 @@ def get_databricks_headers() -> Dict[str, Optional[str]]:
     - X-Forwarded-Email: User email from IdP
     - X-Real-Ip: Client IP address
     - X-Request-Id: Request UUID
-    
+
     Returns dict with all headers (None if not available).
     """
     result = {
@@ -96,7 +97,7 @@ def get_databricks_headers() -> Dict[str, Optional[str]]:
         "client_ip": None,
         "request_id": None
     }
-    
+
     # Try to get from Streamlit headers (available in recent versions)
     try:
         headers = st.context.headers
@@ -109,7 +110,7 @@ def get_databricks_headers() -> Dict[str, Optional[str]]:
         return result
     except AttributeError:
         pass
-    
+
     # Fallback: Try experimental get_script_run_ctx
     try:
         from streamlit.runtime.scriptrunner import get_script_run_ctx
@@ -124,14 +125,14 @@ def get_databricks_headers() -> Dict[str, Optional[str]]:
             result["request_id"] = _get_header(headers, "X-Request-Id")
     except Exception:
         pass
-    
+
     return result
 
 
 def get_user_email() -> str:
     """
     Get user email from X-Forwarded-Email header.
-    
+
     Falls back to 'anonymous@local' for local development.
     """
     headers = get_databricks_headers()
@@ -141,7 +142,7 @@ def get_user_email() -> str:
 def get_session_context() -> SessionContext:
     """
     Get or create session context for current user.
-    
+
     Captures all available Databricks Apps headers on first call.
     Session start time is captured once per Streamlit session.
     """
@@ -149,7 +150,7 @@ def get_session_context() -> SessionContext:
     if "_session_context" not in st.session_state:
         headers = get_databricks_headers()
         session_start = datetime.now()
-        
+
         st.session_state._session_context = SessionContext(
             user_email=headers.get("email") or "anonymous@local",
             session_start=session_start,
@@ -157,5 +158,5 @@ def get_session_context() -> SessionContext:
             username=headers.get("username"),
             client_ip=headers.get("client_ip")
         )
-    
+
     return st.session_state._session_context

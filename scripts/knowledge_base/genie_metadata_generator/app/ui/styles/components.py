@@ -252,7 +252,7 @@ COMPONENT_CSS = """
     .pills-nav-container {
         padding: var(--md-spacing-sm, 8px);
     }
-    
+
     .pills-nav-container .stButton > button {
         font-size: 12px;
         padding: 8px 12px;
@@ -276,7 +276,7 @@ COMPONENT_CSS = """
     .genify-logo {
         color: #90CAF9 !important; /* Light blue for dark mode */
     }
-    
+
     .genify-tagline {
         color: rgba(255, 255, 255, 0.87) !important; /* Light text for dark mode */
     }

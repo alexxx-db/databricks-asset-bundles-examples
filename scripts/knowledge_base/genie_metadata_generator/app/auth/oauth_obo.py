@@ -13,19 +13,19 @@ When ready to switch:
 def get_connection():
     """
     Future: Implement OAuth on-behalf-of authentication.
-    
+
     This will allow the app to query data as the logged-in user,
     respecting their Unity Catalog permissions.
-    
+
     Migration path:
     1. Implement OAuth flow using databricks-sdk
     2. Use user's access token for authentication
     3. Update app.yaml to enable OBO mode
     4. Test with user-specific permissions
-    
+
     Returns:
         Connection object (not yet implemented)
-    
+
     Raises:
         NotImplementedError: OBO auth not yet available
     """

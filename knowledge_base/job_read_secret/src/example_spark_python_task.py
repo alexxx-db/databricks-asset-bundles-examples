@@ -1,8 +1,7 @@
 #!/usr/bin/env python
 
-import os
-from datetime import datetime
 import argparse
+from datetime import datetime
 
 
 def main():

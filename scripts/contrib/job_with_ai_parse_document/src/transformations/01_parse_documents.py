@@ -37,7 +37,7 @@ spark.sql(f"USE SCHEMA {schema}")
 
 # COMMAND ----------
 
-from pyspark.sql.functions import col, current_timestamp, expr
+from pyspark.sql.functions import current_timestamp, expr
 from pyspark.sql.types import (
     StructType,
     StructField,

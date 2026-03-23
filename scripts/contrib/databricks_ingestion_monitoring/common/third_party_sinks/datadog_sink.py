@@ -8,10 +8,9 @@ import json
 import logging
 import requests
 import gzip
-from typing import List, Dict, Any, Optional
+from typing import Dict, Any, Optional
 from tenacity import retry, stop_after_delay, wait_exponential
 from datetime import datetime, timezone
-from pyspark.sql import SparkSession
 from pyspark.sql.types import StringType, ArrayType
 from pyspark.sql.functions import (
     lit,

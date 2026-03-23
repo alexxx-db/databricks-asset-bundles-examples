@@ -1,5 +1,4 @@
 # Databricks notebook source
-from pyspark.sql import functions as F
 
 df = (
     spark.readStream.format("cloudFiles")

@@ -69,6 +69,6 @@ with open("../configs/environment.json", "w") as f:
     json.dump(all_configs, f)
 
 logger.info(
-    f"==========\n%s\n==========",
+    "==========\n%s\n==========",
     "\n".join(f"{k}: {v}" for k, v in all_configs.items()),
 )

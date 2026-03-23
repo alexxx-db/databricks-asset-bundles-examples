@@ -8,13 +8,13 @@ Uses moto to mock S3 — no real AWS calls.
 from __future__ import annotations
 
 import json
-import pytest
+from unittest.mock import MagicMock
+
 import boto3
+import pytest
 from moto import mock_aws
-from unittest.mock import MagicMock, patch
 
-from iceberg_catalog.table_migration import IcebergTableRegistrar, TableLocation
-
+from iceberg_catalog.table_migration import IcebergTableRegistrar
 
 BUCKET = "iceberg-lakehouse"
 PREFIX = "iceberg/iceberg_db/finops/pipeline_runs"

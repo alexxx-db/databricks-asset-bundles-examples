@@ -12,6 +12,7 @@ variables:
 targets:
   dev:
     default: true
+    mode: development
     variables:
       name_suffix: foo
 

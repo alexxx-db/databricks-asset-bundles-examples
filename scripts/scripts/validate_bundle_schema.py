@@ -40,7 +40,7 @@ def main():
             print(f"ERROR: {err}", file=sys.stderr)
         sys.exit(1)
 
-    print(f"\nAll databricks.yml files valid.")
+    print("\nAll databricks.yml files valid.")
 
 
 if __name__ == "__main__":

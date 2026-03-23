@@ -1,9 +1,9 @@
 from databricks.bundles.jobs import (
     Job,
     NotebookTask,
+    TableUpdateTriggerConfiguration,
     Task,
     TriggerSettings,
-    TableUpdateTriggerConfiguration,
 )
 
 consume_table = Task(

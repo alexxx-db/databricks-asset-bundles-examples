@@ -29,6 +29,14 @@ dist/
 build/
 *.egg
 
+# ─── Secrets / Credentials ──────────────────────────────────────────────────
+.env
+.env.*
+*.pem
+*.key
+credentials*
+!credentials*.md
+
 # ─── AI Coding Assistants — Skills, Configs, and Dev Kits ───────────────────
 
 # Claude Code

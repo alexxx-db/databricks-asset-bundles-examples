@@ -25,7 +25,6 @@ import json
 import logging
 import re
 from dataclasses import dataclass
-from typing import Optional
 
 import boto3
 import snowflake.connector
@@ -66,8 +65,8 @@ class TableLocation:
     table:             str
     s3_base_location:  str    # e.g. s3://iceberg-lakehouse/iceberg/.../finops/pipeline_runs
     metadata_location: str    # e.g. s3://.../.../metadata/00003-<uuid>.metadata.json
-    snapshot_id:       Optional[int] = None
-    schema_id:         Optional[int] = None
+    snapshot_id:       int | None = None
+    schema_id:         int | None = None
 
 
 class IcebergTableRegistrar:
@@ -194,7 +193,7 @@ class IcebergTableRegistrar:
             )
         return sorted(keys)[-1]   # lexicographic sort is version-monotone for Iceberg
 
-    def _read_metadata_snapshot(self, bucket: str, metadata_key: str) -> tuple[Optional[int], Optional[int]]:
+    def _read_metadata_snapshot(self, bucket: str, metadata_key: str) -> tuple[int | None, int | None]:
         """Read metadata.json from S3 and extract the current snapshot ID + schema ID."""
         try:
             resp = self._s3.get_object(Bucket=bucket, Key=metadata_key)

@@ -9,13 +9,13 @@ References:
 Key Implementation Notes (from Databricks docs):
 1. Automatic privilege filtering: system.information_schema automatically filters results to show
    only objects you have Unity Catalog privileges to access. This is different from other system tables.
-   
-2. Performance: Always use selective filters (WHERE table_catalog = 'x' AND table_schema = 'y') 
+
+2. Performance: Always use selective filters (WHERE table_catalog = 'x' AND table_schema = 'y')
    to prevent query timeouts. LIMIT pushdown is NOT supported - use WHERE clauses for filtering.
-   
+
 3. Lowercase identifiers: All identifiers (except column/tag names) are stored as lowercase STRING.
    Compare directly without LOWER() or UPPER() functions for better performance.
-   
+
 4. Manual sync: Some catalog metadata changes may require REPAIR TABLE to reflect in information_schema.
 
 Information Schema Views Used:
@@ -29,10 +29,10 @@ Information Schema Views Used:
 def list_catalogs(connection):
     """
     List all accessible catalogs.
-    
+
     Args:
         connection: Databricks SQL connection
-    
+
     Returns:
         List of tuples: (catalog_name, catalog_owner, comment, created)
     """
@@ -48,11 +48,11 @@ def list_catalogs(connection):
 def list_schemas(connection, catalog):
     """
     List schemas in a catalog.
-    
+
     Args:
         connection: Databricks SQL connection
         catalog: Catalog name
-    
+
     Returns:
         List of tuples: (schema_name, schema_owner, comment)
     """
@@ -69,18 +69,18 @@ def list_schemas(connection, catalog):
 def list_tables(connection, catalog, schema):
     """
     List tables with metadata.
-    
+
     Args:
         connection: Databricks SQL connection
         catalog: Catalog name
         schema: Schema name
-    
+
     Returns:
         List of tuples: (table_name, table_type, comment, created_by, last_altered, data_source_format)
     """
     with connection.cursor() as cursor:
         cursor.execute("""
-            SELECT 
+            SELECT
                 table_name,
                 table_type,
                 comment,
@@ -98,19 +98,19 @@ def list_tables(connection, catalog, schema):
 def get_table_columns(connection, catalog, schema, table):
     """
     Get columns with types and existing comments.
-    
+
     Args:
         connection: Databricks SQL connection
         catalog: Catalog name
         schema: Schema name
         table: Table name
-    
+
     Returns:
         List of tuples: (column_name, data_type, comment, ordinal_position, is_nullable)
     """
     with connection.cursor() as cursor:
         cursor.execute("""
-            SELECT 
+            SELECT
                 column_name,
                 data_type,
                 comment,
@@ -128,19 +128,19 @@ def get_table_columns(connection, catalog, schema, table):
 def get_table_metadata(connection, catalog, schema, table):
     """
     Get comprehensive table metadata.
-    
+
     Args:
         connection: Databricks SQL connection
         catalog: Catalog name
         schema: Schema name
         table: Table name
-    
+
     Returns:
         Tuple: (table_name, table_type, comment, created, created_by, last_altered, last_altered_by, data_source_format)
     """
     with connection.cursor() as cursor:
         cursor.execute("""
-            SELECT 
+            SELECT
                 table_name,
                 table_type,
                 comment,
@@ -160,22 +160,22 @@ def get_table_metadata(connection, catalog, schema, table):
 def build_table_context(connection, catalog, schema, table):
     """
     Build comprehensive table context for LLM interview.
-    
+
     Args:
         connection: Databricks SQL connection
         catalog: Catalog name
         schema: Schema name
         table: Table name
-    
+
     Returns:
         Dict with table metadata and columns
     """
     metadata = get_table_metadata(connection, catalog, schema, table)
     columns = get_table_columns(connection, catalog, schema, table)
-    
+
     if not metadata:
         return None
-    
+
     return {
         "catalog": catalog,
         "schema": schema,
@@ -203,13 +203,13 @@ def build_table_context(connection, catalog, schema, table):
 def get_columns_for_table(connection, catalog, schema, table):
     """
     Get columns in a format suitable for profiling.
-    
+
     Args:
         connection: Databricks SQL connection
         catalog: Catalog name
         schema: Schema name
         table: Table name
-    
+
     Returns:
         List of dicts with 'name' and 'type' keys
     """

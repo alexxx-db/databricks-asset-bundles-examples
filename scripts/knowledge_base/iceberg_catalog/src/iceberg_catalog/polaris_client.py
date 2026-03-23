@@ -20,7 +20,8 @@ from __future__ import annotations
 import logging
 import time
 from dataclasses import dataclass, field
-from typing import Any, Optional
+from typing import Any
+
 import requests
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
@@ -36,7 +37,7 @@ class IcebergField:
     name:      str
     type:      str            # Iceberg type string e.g. "long", "string", "timestamp"
     required:  bool = True
-    doc:       Optional[str] = None
+    doc:       str | None = None
 
 @dataclass
 class IcebergSchema:
@@ -49,7 +50,7 @@ class IcebergTableSummary:
     name:        str
     location:    str           # s3://... base location
     metadata_location: str     # s3://.../.../metadata/00001-<uuid>.metadata.json
-    current_schema: Optional[IcebergSchema] = None
+    current_schema: IcebergSchema | None = None
 
 @dataclass
 class PolarisNamespace:
@@ -97,7 +98,7 @@ class PolarisClient:
         self._scope          = f"PRINCIPAL_ROLE:{principal_role}"
         self._catalog_name   = catalog_name
         self._timeout        = timeout_seconds
-        self._token: Optional[_OAuthToken] = None
+        self._token: _OAuthToken | None = None
 
         # Retry on transient 5xx and connection errors
         retry = Retry(
@@ -119,7 +120,7 @@ class PolarisClient:
         secret_scope:      str,
         principal_role:    str,
         catalog_name:      str = "ICEBERG_LAKEHOUSE",
-    ) -> "PolarisClient":
+    ) -> PolarisClient:
         """
         Construct from Databricks secrets.  Call from inside a Databricks
         notebook or job task where dbutils is available.
@@ -130,7 +131,7 @@ class PolarisClient:
             raise RuntimeError(
                 "PolarisClient.from_secrets() must be called inside a "
                 "Databricks runtime (dbutils not available)"
-            )
+            ) from None
 
         account = snowflake_account.rstrip("/")
         return cls(
@@ -198,7 +199,7 @@ class PolarisClient:
 
     # ── Namespace (schema) operations ─────────────────────────────────────────
 
-    def list_namespaces(self, parent: Optional[str] = None) -> list[PolarisNamespace]:
+    def list_namespaces(self, parent: str | None = None) -> list[PolarisNamespace]:
         """List all namespaces (schemas) in the catalog."""
         params = f"?parent={parent}" if parent else ""
         body = self._get(f"/namespaces{params}")
@@ -209,7 +210,7 @@ class PolarisClient:
             results.append(PolarisNamespace(name=name))
         return results
 
-    def create_namespace(self, name: str, properties: Optional[dict[str, str]] = None) -> PolarisNamespace:
+    def create_namespace(self, name: str, properties: dict[str, str] | None = None) -> PolarisNamespace:
         body = self._post("/namespaces", {
             "namespace":  [name],
             "properties": properties or {},
@@ -265,9 +266,9 @@ class PolarisClient:
         namespace:       str,
         table:           str,
         schema:          dict,                    # Iceberg schema dict
-        location:        Optional[str] = None,
-        partition_spec:  Optional[dict] = None,
-        properties:      Optional[dict] = None,
+        location:        str | None = None,
+        partition_spec:  dict | None = None,
+        properties:      dict | None = None,
     ) -> IcebergTableSummary:
         """
         Create a new Iceberg table in Polaris.
@@ -285,7 +286,7 @@ class PolarisClient:
         if properties:
             body["properties"] = properties
 
-        resp = self._post(f"/namespaces/{namespace}/tables", body)
+        self._post(f"/namespaces/{namespace}/tables", body)
         return self.load_table(namespace, table)
 
     def drop_table(self, namespace: str, table: str, purge: bool = False) -> None:

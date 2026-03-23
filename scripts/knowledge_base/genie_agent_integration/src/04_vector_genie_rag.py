@@ -33,16 +33,14 @@
 import json
 import time
 from operator import itemgetter
-from typing import Any, Dict, List
+from typing import Any, Dict
 
 import mlflow
 import requests
 from databricks.sdk import WorkspaceClient
 from databricks.vector_search.client import VectorSearchClient
-from langchain.tools import tool
 from langchain_community.chat_models import ChatDatabricks
 from langchain_community.vectorstores import DatabricksVectorSearch
-from langchain_core.embeddings import Embeddings
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.runnables import RunnableLambda, RunnableParallel, RunnablePassthrough

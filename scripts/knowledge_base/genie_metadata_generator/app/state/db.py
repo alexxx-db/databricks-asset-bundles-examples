@@ -27,22 +27,22 @@ _connection = None
 def get_lakebase_connection():
     """
     Get or create a Lakebase PostgreSQL connection.
-    
+
     In Databricks Apps, connection details are provided via standard
     PostgreSQL environment variables (PGHOST, PGPORT, etc.) set automatically
     when you add a database resource.
-    
+
     For local development, you can use LAKEBASE_* variables as fallback.
-    
+
     Returns:
         psycopg2 connection object
-        
+
     Raises:
         ImportError: If psycopg2 is not installed
         Exception: If connection fails
     """
     global _connection
-    
+
     # Return cached connection if still valid
     if _connection is not None:
         try:
@@ -53,15 +53,15 @@ def get_lakebase_connection():
         except Exception:
             logger.warning("Lakebase connection lost, reconnecting...")
             _connection = None
-    
+
     try:
         import psycopg2
     except ImportError:
         raise ImportError(
             "psycopg2 is required for Lakebase backend. "
             "Install with: pip install psycopg2-binary"
-        )
-    
+        ) from None
+
     # Get connection parameters from environment
     # Priority: Standard PG* vars (Databricks Apps) > LAKEBASE_* vars (local dev)
     host = os.getenv("PGHOST") or os.getenv("LAKEBASE_HOST")
@@ -70,27 +70,27 @@ def get_lakebase_connection():
     user = os.getenv("PGUSER") or os.getenv("LAKEBASE_USER")
     sslmode = os.getenv("PGSSLMODE", "require")
     password = os.getenv("LAKEBASE_PASSWORD")  # Only for local dev; Databricks uses OAuth
-    
+
     if not host:
         raise ValueError(
             "PGHOST environment variable not set. "
             "Ensure a database resource is configured in Databricks Apps, "
             "or set LAKEBASE_HOST for local development."
         )
-    
+
     if not password:
         # Get OAuth token via client credentials flow
         password = _get_oauth_token()
-    
+
     if not password:
         raise ValueError(
             "No password or OAuth token available. "
             "Ensure DATABRICKS_HOST, DATABRICKS_CLIENT_ID, and DATABRICKS_CLIENT_SECRET are set. "
             "For local dev, set LAKEBASE_PASSWORD."
         )
-    
+
     logger.info(f"Connecting to Lakebase at {host}:{port}/{database} (user={user}, sslmode={sslmode})")
-    
+
     try:
         _connection = psycopg2.connect(
             host=host,
@@ -101,18 +101,18 @@ def get_lakebase_connection():
             sslmode=sslmode,
             connect_timeout=10,
         )
-        
+
         # Set connection to autocommit=False for explicit transaction control
         _connection.autocommit = False
-        
+
         # Log successful connection with server info
         with _connection.cursor() as cur:
             cur.execute("SELECT version()")
-            version = cur.fetchone()[0].split(',')[0] if cur.fetchone else "unknown"
-        
+            cur.fetchone()[0].split(',')[0] if cur.fetchone else "unknown"
+
         logger.info(f"Lakebase connection established successfully to {host}:{port}/{database}")
         return _connection
-        
+
     except Exception as e:
         logger.error(f"Failed to connect to Lakebase at {host}:{port}/{database}: {e}")
         raise
@@ -121,21 +121,21 @@ def get_lakebase_connection():
 def _get_oauth_token() -> Optional[str]:
     """
     Get OAuth token for Lakebase authentication using client credentials flow.
-    
+
     Uses environment variables provided by Databricks Apps:
     - DATABRICKS_HOST: Workspace URL
     - DATABRICKS_CLIENT_ID: Service principal client ID
     - DATABRICKS_CLIENT_SECRET: Service principal secret
-    
+
     Returns:
         OAuth access token string, or None if credentials unavailable
     """
     import requests
-    
+
     host = os.getenv("DATABRICKS_HOST")
     client_id = os.getenv("DATABRICKS_CLIENT_ID")
     client_secret = os.getenv("DATABRICKS_CLIENT_SECRET")
-    
+
     # Check all required credentials are present
     if not host:
         logger.warning("DATABRICKS_HOST not set - cannot obtain OAuth token")
@@ -146,16 +146,16 @@ def _get_oauth_token() -> Optional[str]:
     if not client_secret:
         logger.warning("DATABRICKS_CLIENT_SECRET not set - cannot obtain OAuth token")
         return None
-    
+
     # Ensure host has https:// scheme
     if not host.startswith("https://") and not host.startswith("http://"):
         host = f"https://{host}"
-    
+
     # OAuth2 token endpoint
     token_url = f"{host.rstrip('/')}/oidc/v1/token"
-    
+
     logger.info(f"Requesting OAuth token from {token_url}")
-    
+
     try:
         response = requests.post(
             token_url,
@@ -169,17 +169,17 @@ def _get_oauth_token() -> Optional[str]:
             timeout=10
         )
         response.raise_for_status()
-        
+
         token_data = response.json()
         access_token = token_data.get("access_token")
-        
+
         if access_token:
             logger.info("Successfully obtained OAuth token via client credentials flow")
             return access_token
         else:
             logger.warning("OAuth response did not contain access_token")
             return None
-            
+
     except requests.exceptions.RequestException as e:
         logger.error(f"Failed to obtain OAuth token: {e}")
         return None
@@ -188,11 +188,11 @@ def _get_oauth_token() -> Optional[str]:
 def get_lakebase_connection_safe():
     """
     Safely get Lakebase connection, returning None if unavailable.
-    
+
     This is a safe wrapper around get_lakebase_connection() that returns None
     instead of raising exceptions, allowing the app to gracefully degrade to
     in-memory session state when Lakebase is unavailable.
-    
+
     Returns:
         Connection object or None if connection fails
     """
@@ -206,7 +206,7 @@ def get_lakebase_connection_safe():
 def close_connection() -> None:
     """Close the Lakebase connection."""
     global _connection
-    
+
     if _connection is not None:
         try:
             _connection.close()
@@ -220,16 +220,16 @@ def close_connection() -> None:
 def get_connection_status() -> dict:
     """
     Get status of the Lakebase connection.
-    
+
     Returns:
         Dict with connection status information
     """
     global _connection
-    
+
     # Check which env vars are set (for diagnostics)
     host = os.getenv("PGHOST") or os.getenv("LAKEBASE_HOST")
     database = os.getenv("PGDATABASE") or os.getenv("LAKEBASE_DATABASE")
-    
+
     if _connection is None:
         return {
             "connected": False,
@@ -237,12 +237,12 @@ def get_connection_status() -> dict:
             "database": database,
             "error": "No active connection"
         }
-    
+
     try:
         with _connection.cursor() as cur:
             cur.execute("SELECT current_database(), current_user, inet_server_addr()")
             row = cur.fetchone()
-            
+
             return {
                 "connected": True,
                 "database": row[0],
@@ -260,34 +260,34 @@ def get_connection_status() -> dict:
 def get_persistence_service(user_email: str) -> Optional['PersistenceService']:
     """
     Get PersistenceService instance or None if Lakebase unavailable.
-    
+
     This function gracefully handles:
     - Lakebase disabled in config
     - Connection failures
     - Missing dependencies
-    
+
     Returns None instead of raising exceptions, allowing app to run
     with reduced functionality.
-    
+
     Args:
         user_email: Current user's email
-    
+
     Returns:
         PersistenceService instance or None if unavailable
     """
     from config import config
-    
+
     # Check if Lakebase is enabled first
     if not config.lakebase_enabled:
         logger.debug("PersistenceService unavailable: Lakebase disabled")
         return None
-    
+
     # Try to get connection (returns None on failure)
     conn = get_lakebase_connection_safe()
     if not conn:
         logger.debug("PersistenceService unavailable: Connection failed")
         return None
-    
+
     try:
         from state.persistence import PersistenceService
         return PersistenceService(conn, user_email)

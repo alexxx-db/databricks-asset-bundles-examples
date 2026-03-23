@@ -17,16 +17,16 @@ def cached_state(
 ) -> Any:
     """
     Cache result in session_state with optional TTL and invalidation.
-    
+
     Args:
         key: Unique cache key
         compute_fn: Function to compute value if not cached
         ttl_seconds: Time-to-live in seconds (None = no expiration)
         invalidate_on: List of session_state keys to watch for changes
-        
+
     Returns:
         Cached or freshly computed value
-        
+
     Example:
         >>> sessions = cached_state(
         ...     "history_sessions",
@@ -37,7 +37,7 @@ def cached_state(
     cache_key = f"_cache_{key}"
     timestamp_key = f"_cache_{key}_ts"
     hash_key = f"_cache_{key}_hash"
-    
+
     # Check TTL expiration
     if ttl_seconds and timestamp_key in st.session_state:
         if time.time() - st.session_state[timestamp_key] > ttl_seconds:
@@ -46,7 +46,7 @@ def cached_state(
                 del st.session_state[cache_key]
                 if timestamp_key in st.session_state:
                     del st.session_state[timestamp_key]
-    
+
     # Check invalidation keys
     if invalidate_on:
         current_hash = hash(tuple(st.session_state.get(k) for k in invalidate_on))
@@ -57,26 +57,26 @@ def cached_state(
                 if timestamp_key in st.session_state:
                     del st.session_state[timestamp_key]
         st.session_state[hash_key] = current_hash
-    
+
     # Return cached or compute
     if cache_key not in st.session_state:
         st.session_state[cache_key] = compute_fn()
         st.session_state[timestamp_key] = time.time()
-    
+
     return st.session_state[cache_key]
 
 
 def invalidate_cache(key: str):
     """
     Manually invalidate a cache entry.
-    
+
     Args:
         key: Cache key to invalidate
     """
     cache_key = f"_cache_{key}"
     timestamp_key = f"_cache_{key}_ts"
     hash_key = f"_cache_{key}_hash"
-    
+
     for k in [cache_key, timestamp_key, hash_key]:
         if k in st.session_state:
             del st.session_state[k]

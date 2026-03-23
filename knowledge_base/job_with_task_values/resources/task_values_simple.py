@@ -1,4 +1,4 @@
-from databricks.bundles.jobs import Job, Task, NotebookTask, TaskDependency
+from databricks.bundles.jobs import Job, NotebookTask, Task, TaskDependency
 
 producer = Task(
     task_key="producer",

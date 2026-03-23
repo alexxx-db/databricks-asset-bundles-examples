@@ -33,7 +33,15 @@ dbutils.widgets.text("uc_catalog",      "iceberg_db")
 dbutils.widgets.text("retention_hours", "168")   # 7 days
 dbutils.widgets.text("dry_run",         "false")
 
-uc_catalog       = dbutils.widgets.get("uc_catalog")
+import re
+
+_ID_RE = re.compile(r"^[a-zA-Z0-9_]+$")
+def _validate_id(name, kind="identifier"):
+    if not _ID_RE.match(name):
+        raise ValueError(f"{kind} contains invalid characters: {name!r}")
+    return name
+
+uc_catalog       = _validate_id(dbutils.widgets.get("uc_catalog"), "catalog")
 retention_hours  = int(dbutils.widgets.get("retention_hours"))
 dry_run          = dbutils.widgets.get("dry_run").lower() == "true"
 
@@ -127,6 +135,7 @@ for schema_name in schema_names:
 
 # Emit structured summary for Databricks job output / downstream alerting
 import json
+
 print(json.dumps({
     "cutoff_timestamp": cutoff_ts.isoformat(),
     "retention_hours":  retention_hours,

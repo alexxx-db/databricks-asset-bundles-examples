@@ -72,9 +72,9 @@ variables:
     default: {}
 
 targets:
-#  dev:
-#    default: true
-#    mode: development
+  dev:
+    default: true
+    mode: development
 #    variables:
 # Configure the target monitoring catalog and schema. See variables in <root>/vars/common.vars.yml
 # Configure imports of pipeline event logs not stored in a Delta table. See variables in <root>/vars/import_event_logs.vars.yml

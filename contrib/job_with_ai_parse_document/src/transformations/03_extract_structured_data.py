@@ -31,7 +31,7 @@ spark.sql(f"USE SCHEMA {schema}")
 
 # COMMAND ----------
 
-from pyspark.sql.functions import col, concat, current_timestamp, expr, length, lit
+from pyspark.sql.functions import col, current_timestamp, expr, length
 
 # Read from source table using Structured Streaming
 text_stream = (

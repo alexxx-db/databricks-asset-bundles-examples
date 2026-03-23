@@ -1,7 +1,6 @@
 """Tests for COMMENT ON TABLE/COLUMN SQL generation (validation and escaping)."""
 
 import pytest
-
 from app.utils.comment_sql import escape_sql_string, generate_comment_sql
 from app.utils.sql_identifiers import InvalidIdentifierError
 

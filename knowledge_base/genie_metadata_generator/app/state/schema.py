@@ -10,14 +10,14 @@ logger = logging.getLogger(__name__)
 def ensure_genify_schema_exists(connection):
     """
     Create all Genify tables on first run. Idempotent.
-    
+
     Creates:
     - genify.sessions: Session metadata
     - genify.saved_tables: Completed table YAMLs
     - genify.genie_spaces: Genie space configurations
     - genify.yaml_library: Reusable YAML library
     - genify.session_snapshots: In-progress interview states
-    
+
     Args:
         connection: psycopg2 connection object
     """
@@ -26,7 +26,7 @@ def ensure_genify_schema_exists(connection):
             # Create schema
             cur.execute("CREATE SCHEMA IF NOT EXISTS genify")
             logger.info("Ensured schema 'genify' exists")
-            
+
             # Table 1: sessions
             cur.execute("""
                 CREATE TABLE IF NOT EXISTS genify.sessions (
@@ -42,19 +42,19 @@ def ensure_genify_schema_exists(connection):
                     created_at TIMESTAMP NOT NULL DEFAULT NOW()
                 )
             """)
-            
+
             cur.execute("""
-                CREATE INDEX IF NOT EXISTS idx_sessions_user_email 
+                CREATE INDEX IF NOT EXISTS idx_sessions_user_email
                 ON genify.sessions(user_email)
             """)
-            
+
             cur.execute("""
-                CREATE INDEX IF NOT EXISTS idx_sessions_active 
+                CREATE INDEX IF NOT EXISTS idx_sessions_active
                 ON genify.sessions(user_email, is_active)
             """)
-            
+
             logger.info("Ensured table 'genify.sessions' exists")
-            
+
             # Table 2: saved_tables
             cur.execute("""
                 CREATE TABLE IF NOT EXISTS genify.saved_tables (
@@ -71,24 +71,24 @@ def ensure_genify_schema_exists(connection):
                     UNIQUE(session_id, catalog, schema, table_name)
                 )
             """)
-            
+
             cur.execute("""
-                CREATE INDEX IF NOT EXISTS idx_saved_tables_user 
+                CREATE INDEX IF NOT EXISTS idx_saved_tables_user
                 ON genify.saved_tables(user_email)
             """)
-            
+
             cur.execute("""
-                CREATE INDEX IF NOT EXISTS idx_saved_tables_session 
+                CREATE INDEX IF NOT EXISTS idx_saved_tables_session
                 ON genify.saved_tables(session_id)
             """)
-            
+
             cur.execute("""
-                CREATE INDEX IF NOT EXISTS idx_saved_tables_table 
+                CREATE INDEX IF NOT EXISTS idx_saved_tables_table
                 ON genify.saved_tables(catalog, schema, table_name)
             """)
-            
+
             logger.info("Ensured table 'genify.saved_tables' exists")
-            
+
             # Table 3: genie_spaces
             cur.execute("""
                 CREATE TABLE IF NOT EXISTS genify.genie_spaces (
@@ -101,19 +101,19 @@ def ensure_genify_schema_exists(connection):
                     saved_at TIMESTAMP NOT NULL DEFAULT NOW()
                 )
             """)
-            
+
             cur.execute("""
-                CREATE INDEX IF NOT EXISTS idx_genie_spaces_user 
+                CREATE INDEX IF NOT EXISTS idx_genie_spaces_user
                 ON genify.genie_spaces(user_email)
             """)
-            
+
             cur.execute("""
-                CREATE INDEX IF NOT EXISTS idx_genie_spaces_session 
+                CREATE INDEX IF NOT EXISTS idx_genie_spaces_session
                 ON genify.genie_spaces(session_id)
             """)
-            
+
             logger.info("Ensured table 'genify.genie_spaces' exists")
-            
+
             # Table 4: yaml_library
             cur.execute("""
                 CREATE TABLE IF NOT EXISTS genify.yaml_library (
@@ -131,29 +131,29 @@ def ensure_genify_schema_exists(connection):
                     UNIQUE(user_email, catalog, schema, table_name, yaml_type)
                 )
             """)
-            
+
             cur.execute("""
-                CREATE INDEX IF NOT EXISTS idx_yaml_library_user 
+                CREATE INDEX IF NOT EXISTS idx_yaml_library_user
                 ON genify.yaml_library(user_email)
             """)
-            
+
             cur.execute("""
-                CREATE INDEX IF NOT EXISTS idx_yaml_library_table 
+                CREATE INDEX IF NOT EXISTS idx_yaml_library_table
                 ON genify.yaml_library(catalog, schema, table_name)
             """)
-            
+
             cur.execute("""
-                CREATE INDEX IF NOT EXISTS idx_yaml_library_type 
+                CREATE INDEX IF NOT EXISTS idx_yaml_library_type
                 ON genify.yaml_library(yaml_type)
             """)
-            
+
             cur.execute("""
-                CREATE INDEX IF NOT EXISTS idx_yaml_library_tags 
+                CREATE INDEX IF NOT EXISTS idx_yaml_library_tags
                 ON genify.yaml_library USING GIN(tags)
             """)
-            
+
             logger.info("Ensured table 'genify.yaml_library' exists")
-            
+
             # Table 5: session_snapshots
             cur.execute("""
                 CREATE TABLE IF NOT EXISTS genify.session_snapshots (
@@ -169,22 +169,22 @@ def ensure_genify_schema_exists(connection):
                     UNIQUE(session_id)
                 )
             """)
-            
+
             cur.execute("""
-                CREATE INDEX IF NOT EXISTS idx_session_snapshots_session 
+                CREATE INDEX IF NOT EXISTS idx_session_snapshots_session
                 ON genify.session_snapshots(session_id)
             """)
-            
+
             cur.execute("""
-                CREATE INDEX IF NOT EXISTS idx_session_snapshots_user 
+                CREATE INDEX IF NOT EXISTS idx_session_snapshots_user
                 ON genify.session_snapshots(user_email)
             """)
-            
+
             logger.info("Ensured table 'genify.session_snapshots' exists")
-            
+
             connection.commit()
             logger.info("✓ Genify schema initialization complete")
-            
+
     except Exception as e:
         logger.error(f"Error creating Genify schema: {e}")
         connection.rollback()

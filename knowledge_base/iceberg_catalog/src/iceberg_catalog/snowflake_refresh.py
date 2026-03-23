@@ -32,7 +32,6 @@ from __future__ import annotations
 
 import logging
 from dataclasses import dataclass
-from typing import Optional
 
 import snowflake.connector
 
@@ -50,7 +49,7 @@ class RefreshResult:
     table_fqn:         str
     metadata_location: str
     success:           bool
-    error_message:     Optional[str] = None
+    error_message:     str | None = None
 
 
 class SnowflakeRefreshClient:
@@ -84,12 +83,12 @@ class SnowflakeRefreshClient:
         secret_scope:        str,
         sf_polaris_catalog:  str = "ICEBERG_LAKEHOUSE",
         sf_warehouse:        str = "COMPUTE_WH",
-    ) -> "SnowflakeRefreshClient":
+    ) -> SnowflakeRefreshClient:
         """Construct from Databricks secrets (for use in Databricks runtime)."""
         try:
             from databricks.sdk.runtime import dbutils  # noqa
         except ImportError:
-            raise RuntimeError("from_secrets() requires Databricks runtime")
+            raise RuntimeError("from_secrets() requires Databricks runtime") from None
 
         return cls(
             sf_account         = dbutils.secrets.get(secret_scope, "snowflake_account"),

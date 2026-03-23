@@ -18,12 +18,17 @@ We test:
 
 from __future__ import annotations
 
+from unittest.mock import MagicMock
+
 import pytest
-from unittest.mock import MagicMock, patch
 
-from iceberg_catalog.polaris_client import PolarisClient, IcebergField, IcebergSchema, IcebergTableSummary
-from iceberg_catalog.schema_sync import IcebergSchemaSync, DriftKind, SchemaDrift
-
+from iceberg_catalog.polaris_client import (
+    IcebergField,
+    IcebergSchema,
+    IcebergTableSummary,
+    PolarisClient,
+)
+from iceberg_catalog.schema_sync import DriftKind, IcebergSchemaSync
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
 

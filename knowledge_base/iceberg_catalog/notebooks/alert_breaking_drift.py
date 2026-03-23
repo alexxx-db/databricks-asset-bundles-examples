@@ -24,7 +24,6 @@
 
 import json
 import logging
-import os
 
 import requests
 from databricks.sdk import WorkspaceClient

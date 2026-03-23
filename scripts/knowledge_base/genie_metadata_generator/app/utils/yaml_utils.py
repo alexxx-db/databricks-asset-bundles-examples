@@ -12,10 +12,10 @@ logger = logging.getLogger(__name__)
 def validate_yaml(yaml_content: str) -> Tuple[bool, Optional[str]]:
     """
     Atomic YAML validation function.
-    
+
     Args:
         yaml_content: YAML string to validate
-    
+
     Returns:
         (is_valid: bool, error: Optional[str])
     """

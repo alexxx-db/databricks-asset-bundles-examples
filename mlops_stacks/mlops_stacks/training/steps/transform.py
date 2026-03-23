@@ -8,7 +8,7 @@ This module defines the following routines used by the 'transform' step of the r
 from pandas import DataFrame
 from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import Pipeline
-from sklearn.preprocessing import OneHotEncoder, StandardScaler, FunctionTransformer
+from sklearn.preprocessing import FunctionTransformer, OneHotEncoder, StandardScaler
 
 
 def calculate_features(df: DataFrame):

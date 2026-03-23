@@ -10,3 +10,4 @@ workspace:
 targets:
   dev:
     default: true
+    mode: development

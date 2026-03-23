@@ -131,13 +131,13 @@ parsed_results = [row.parsed for row in spark.sql(sql).collect()]
 
 # COMMAND ----------
 
-import json
-from typing import Dict, List, Any, Optional, Tuple, Set, Union
-from IPython.display import HTML, display
 import base64
+import json
 import os
+from typing import Any, Dict, List, Optional, Set, Tuple, Union
+
+from IPython.display import HTML, display
 from PIL import Image
-import io
 
 
 class DocumentRenderer:
@@ -283,7 +283,7 @@ class DocumentRenderer:
                 if for_tooltip:
                     # Compact styling for tooltips with light theme
                     # Use full width available for tooltip tables
-                    table_style = f'''style="width: 100%; border-collapse: collapse; margin: 5px 0; font-size: 10px;"'''
+                    table_style = '''style="width: 100%; border-collapse: collapse; margin: 5px 0; font-size: 10px;"'''
                     th_style = 'style="border: 1px solid #ddd; padding: 4px; background: #f8f9fa; color: #333; font-weight: bold; text-align: left; font-size: 10px;"'
                     td_style = 'style="border: 1px solid #ddd; padding: 4px; color: #333; font-size: 10px;"'
                     thead_style = 'style="background: #e9ecef;"'
@@ -440,8 +440,8 @@ class DocumentRenderer:
         header_info = f"""
         <div style="background: #e3f2fd; border: 1px solid #2196f3; border-radius: 8px; padding: 15px; margin: 10px 0;">
             <strong>Page {page_id + 1}: {len(page_elements)} elements</strong><br>
-            <strong>Original size:</strong> {original_width}×{original_height}px | 
-            <strong>Display size:</strong> {display_width}×{display_height}px | 
+            <strong>Original size:</strong> {original_width}×{original_height}px |
+            <strong>Display size:</strong> {display_width}×{display_height}px |
             <strong>Scale factor:</strong> {scale_factor:.3f}<br>
         </div>
         """
@@ -494,17 +494,17 @@ class DocumentRenderer:
                     tooltip_left = 10
 
                     overlay = f"""
-                    <div id="{box_id}" 
+                    <div id="{box_id}"
                          class="bbox-overlay bbox-{container_id}"
-                         style="position: absolute; 
-                               left: {scaled_x1:.1f}px; top: {scaled_y1:.1f}px; 
+                         style="position: absolute;
+                               left: {scaled_x1:.1f}px; top: {scaled_y1:.1f}px;
                                width: {width:.1f}px; height: {height:.1f}px;
                                border: 2px solid {color};
                                background: {color}25;
                                box-sizing: border-box;
                                cursor: pointer;
                                transition: all 0.2s ease;">
-                        <div style="background: {color}; color: white; 
+                        <div style="background: {color}; color: white;
                                    padding: 1px 4px; font-size: 9px; font-weight: bold;
                                    position: absolute; top: {label_top}px; left: 0;
                                    white-space: nowrap; border-radius: 2px;
@@ -556,17 +556,17 @@ class DocumentRenderer:
                 border-width: 3px !important;
                 z-index: 1001 !important;
             }}
-            
+
             /* Show tooltip on hover using pure CSS */
             .bbox-{container_id}:hover .bbox-tooltip {{
                 display: block !important;
             }}
-            
+
             /* Ensure tooltips appear above other elements */
             .bbox-{container_id} {{
                 z-index: 100;
             }}
-            
+
             .bbox-{container_id}:hover {{
                 z-index: 9999 !important;
             }}
@@ -577,8 +577,8 @@ class DocumentRenderer:
         {header_info}
         {styles}
         <div id="{container_id}" style="position: relative; display: inline-block; border: 2px solid #333; border-radius: 8px; overflow: visible; background: white;">
-            <img src="{img_data_uri}" 
-                 style="display: block; width: {display_width}px; height: {display_height}px;" 
+            <img src="{img_data_uri}"
+                 style="display: block; width: {display_width}px; height: {display_height}px;"
                  alt="Page {page_id + 1}">
             {"".join(overlays)}
         </div>
@@ -626,8 +626,8 @@ class DocumentRenderer:
             display_content = self._render_element_content(element, for_tooltip=False)
 
             element_html = f"""
-            <div style="border-left: 5px solid {color}; 
-                       padding: 15px; margin: 15px 0; 
+            <div style="border-left: 5px solid {color};
+                       padding: 15px; margin: 15px 0;
                        background: {color}15; border-radius: 5px;">
                 <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
                     <h4 style="margin: 0; color: {color}; font-size: 16px;">
@@ -754,7 +754,7 @@ class DocumentRenderer:
                 if elem_type != "default":
                     legend_items.append(f"""
                         <span style="display: inline-block; margin: 5px;">
-                            <span style="display: inline-block; width: 15px; height: 15px; 
+                            <span style="display: inline-block; width: 15px; height: 15px;
                                         background: {color}; border: 1px solid #999; margin-right: 5px;"></span>
                             {elem_type.replace("_", " ").title()}
                         </span>

@@ -29,9 +29,17 @@ dbutils.widgets.text("uc_schema",      "genie_tools")
 dbutils.widgets.text("secret_scope",   "my-genie")
 dbutils.widgets.text("secret_key",     "api_token")
 
+import re
+
+_ID_RE = re.compile(r"^[a-zA-Z0-9_]+$")
+def _validate_id(name, kind="identifier"):
+    if not _ID_RE.match(name):
+        raise ValueError(f"{kind} contains invalid characters: {name!r}")
+    return name
+
 genie_space_id = dbutils.widgets.get("genie_space_id")
-uc_catalog     = dbutils.widgets.get("uc_catalog")
-uc_schema      = dbutils.widgets.get("uc_schema")
+uc_catalog     = _validate_id(dbutils.widgets.get("uc_catalog"), "catalog")
+uc_schema      = _validate_id(dbutils.widgets.get("uc_schema"), "schema")
 secret_scope   = dbutils.widgets.get("secret_scope")
 secret_key     = dbutils.widgets.get("secret_key")
 

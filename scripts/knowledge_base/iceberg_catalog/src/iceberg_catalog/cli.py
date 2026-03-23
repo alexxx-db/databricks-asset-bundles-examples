@@ -17,11 +17,10 @@ from __future__ import annotations
 import json
 import logging
 import sys
-from typing import Optional
 
 import click
-
 from databricks.sdk import WorkspaceClient
+
 from iceberg_catalog.polaris_client import PolarisClient
 from iceberg_catalog.schema_sync import IcebergSchemaSync
 from iceberg_catalog.table_migration import IcebergTableRegistrar

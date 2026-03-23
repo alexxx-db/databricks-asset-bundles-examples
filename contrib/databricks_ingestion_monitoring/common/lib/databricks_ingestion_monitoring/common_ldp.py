@@ -2,14 +2,14 @@
 Common observability functions to be used within SDP pipelines.
 """
 
-from collections import namedtuple
 import logging
-from typing import Callable, Dict, Iterable, List, Optional, Set
+from collections import namedtuple
+from typing import Callable, Dict, Iterable, Set
 
 import dlt
 from databricks.sdk import WorkspaceClient
 from databricks.sdk.errors.platform import ResourceDoesNotExist
-from pyspark.sql import SparkSession, DataFrame
+from pyspark.sql import DataFrame, SparkSession
 
 from .common import parse_comma_separated_list
 from .standard_tables import (
@@ -23,10 +23,9 @@ from .standard_tables import (
     PIPELINE_RUNS_STATUS,
     PIPELINES_STATUS,
     PIPELINES_STATUS_SILVER,
-    PIPELINE_TAGS_INDEX,
     TABLE_EVENTS_EXPECTATION_CHECKS,
-    TABLE_STATUS_PER_PIPELINE_RUN,
     TABLE_STATUS,
+    TABLE_STATUS_PER_PIPELINE_RUN,
 )
 
 
@@ -161,7 +160,7 @@ class MonitoringEtlPipeline:
         if ("name" not in event_log_info) and (
             pipeline_id not in self.other_pipeline_event_logs
         ):
-            raise Exception(f"""Pipeline {spec.get("name")} ({pipeline_id}) is not configured for Delta table event log and is not imported. 
+            raise Exception(f"""Pipeline {spec.get("name")} ({pipeline_id}) is not configured for Delta table event log and is not imported.
                       Either configure the event log to be written to a Delta table or imported it using the import_event_logs job: {spec}""")
 
         if spec.get("gateway_definition") is not None:
@@ -221,7 +220,7 @@ class MonitoringEtlPipeline:
         Registers pipelines that match ANY of the specified tag:value pairs for monitoring.
         :param tags_str: Comma-separated list of tag:value pairs (e.g., "env:prod,team:data")
         """
-        from .common import parse_tag_value_pairs, get_pipeline_ids_by_tags
+        from .common import get_pipeline_ids_by_tags, parse_tag_value_pairs
 
         tag_groups = parse_tag_value_pairs(tags_str)
         if not tag_groups:
@@ -414,8 +413,8 @@ class MonitoringEtlPipeline:
                 create_update_details.explore_only,
                 (create_update_details.explore_only
                     OR maintenance_id IS NOT NULL) AS is_internal_run -- used to filter out internal runs
-          FROM (SELECT origin.pipeline_id, 
-                      origin.update_id AS pipeline_run_id, 
+          FROM (SELECT origin.pipeline_id,
+                      origin.update_id AS pipeline_run_id,
                       origin.maintenance_id,
                       `timestamp` AS create_time,
                       from_json(details, '{details_partial_schema}').create_update AS create_update_details
@@ -428,7 +427,7 @@ class MonitoringEtlPipeline:
             return spark.sql(f"""
           SELECT pipeline_id, pipeline_run_id
           FROM `{Constants.created_pipeline_runs}`
-          WHERE NOT is_internal_run 
+          WHERE NOT is_internal_run
           """)
 
         self.transfom_and_append_event_log_sources(
@@ -443,46 +442,46 @@ class MonitoringEtlPipeline:
         this and replace {Constants.sql_fields_def_extension_point} with additional fiels they want to include
         """
         return f"""
-        SELECT id, 
-              seq_num, 
-              pipeline_id, 
-              pipeline_run_id, 
+        SELECT id,
+              seq_num,
+              pipeline_id,
+              pipeline_run_id,
               ('<a href="/pipelines/' || pipeline_id || '/updates/' || pipeline_run_id || '">' || pipeline_run_id || '</a>') AS pipeline_run_link,
-              
-              coalesce(CASE WHEN els.table_name IS NULL 
-                               OR mp.default_catalog IS NULL 
-                               OR INSTR(els.table_name, '.') > 0 
+
+              coalesce(CASE WHEN els.table_name IS NULL
+                               OR mp.default_catalog IS NULL
+                               OR INSTR(els.table_name, '.') > 0
                           THEN els.table_name
                       ELSE CONCAT(mp.default_catalog, '.', mp.default_schema, '.', els.table_name)
                       END,
-                      CASE WHEN dataset_name IS NULL 
-                               OR mp.default_catalog IS NULL 
-                               OR INSTR(dataset_name, '.') > 0 
+                      CASE WHEN dataset_name IS NULL
+                               OR mp.default_catalog IS NULL
+                               OR INSTR(dataset_name, '.') > 0
                           THEN dataset_name
                       ELSE CONCAT(mp.default_catalog, '.', mp.default_schema, '.', dataset_name)
                       END,
                         details:operation_progress.cdc_snapshot.table_name::string,
-                        ft.table_name) AS table_name, 
-              flow_name, 
-              batch_id, 
-              event_timestamp, 
-              message, 
-              level, 
+                        ft.table_name) AS table_name,
+              flow_name,
+              batch_id,
+              event_timestamp,
+              message,
+              level,
               error_message,
               regexp_extract(error_message, r'^\\[([a-zA-Z.:0-9_]+)\\]', 1) as error_code,
               event_type,
               error_full,
               details{Constants.sql_fields_def_extension_point}
-        FROM (SELECT id, 
+        FROM (SELECT id,
                     sequence.data_plane_id.seq_no as seq_num,
-                    origin.pipeline_id, 
-                    origin.pipeline_name, 
+                    origin.pipeline_id,
+                    origin.pipeline_name,
                     origin.update_id as pipeline_run_id,
                     origin.table_name,
                     origin.dataset_name,
                     origin.flow_name,
-                    origin.batch_id, 
-                    `timestamp` as event_timestamp, 
+                    origin.batch_id,
+                    `timestamp` as event_timestamp,
                     message,
                     level,
                     error.exceptions[0].message as error_message,
@@ -493,7 +492,7 @@ class MonitoringEtlPipeline:
               JOIN `{Constants.standard_pipeline_runs}` USING (pipeline_id, pipeline_run_id)
               LEFT JOIN flow_targets AS ft USING (pipeline_id, pipeline_run_id, flow_name)
               LEFT JOIN {MONITORED_PIPELINES.name} AS mp USING (pipeline_id)
-        WHERE event_type in ('create_update',    
+        WHERE event_type in ('create_update',
                             'update_progress',     -- Pipeline update start and progress events
                             'flow_definition',     -- Flow initialization
                             'dataset_definition',  -- Table initialization
@@ -532,7 +531,7 @@ class MonitoringEtlPipeline:
         dlt.create_streaming_table(
             name="flow_targets",
             cluster_by=["pipeline_id", "pipeline_run_id", "flow_name"],
-            comment="""Keeps track of the target tables for each flow so we can attribute flow_progress events to 
+            comment="""Keeps track of the target tables for each flow so we can attribute flow_progress events to
             specific tables.
             """,
             table_properties={"delta.enableRowTracking": "true"},
@@ -549,17 +548,17 @@ class MonitoringEtlPipeline:
               SELECT pipeline_id,
                     pipeline_run_id,
                     flow_name,
-                    (CASE WHEN details.output_dataset IS NULL 
-                               OR mp.default_catalog IS NULL 
-                               OR INSTR(details.output_dataset, '.') > 0 
+                    (CASE WHEN details.output_dataset IS NULL
+                               OR mp.default_catalog IS NULL
+                               OR INSTR(details.output_dataset, '.') > 0
                           THEN details.output_dataset
                       ELSE CONCAT(mp.default_catalog, '.', mp.default_schema, '.', details.output_dataset)
                       END) AS table_name,
                     details.schema,
                     details.schema_json,
                     details.spark_conf
-              FROM (SELECT origin.pipeline_id, 
-                        origin.pipeline_name, 
+              FROM (SELECT origin.pipeline_id,
+                        origin.pipeline_name,
                         origin.update_id as pipeline_run_id,
                         origin.flow_name,
                         from_json(details, '{partial_flow_definition_details_schema}').flow_definition as details
@@ -620,8 +619,8 @@ class MonitoringEtlPipeline:
             return spark.sql(f"""
         SELECT *,
                ('<span style=''color:' || state_color || '''>' || latest_state || '</span>') AS latest_state_with_color
-        FROM (SELECT  pipeline_id, 
-                  pipeline_run_id, 
+        FROM (SELECT  pipeline_id,
+                  pipeline_run_id,
                   pipeline_run_link,
                   latest_state,
                   (CASE WHEN latest_state = 'FAILED' THEN 'red'
@@ -630,17 +629,17 @@ class MonitoringEtlPipeline:
                         WHEN latest_state = 'CANCELED' THEN 'gray'
                         ELSE 'black'
                         END) AS state_color,
-                   (CASE WHEN latest_state = 'FAILED' THEN 100 
-                         WHEN latest_state = 'CANCELED' THEN 11 
-                         WHEN latest_state = 'COMPLETED' THEN 10 
+                   (CASE WHEN latest_state = 'FAILED' THEN 100
+                         WHEN latest_state = 'CANCELED' THEN 11
+                         WHEN latest_state = 'COMPLETED' THEN 10
                          WHEN latest_state = 'STOPPING' THEN 8
                          WHEN latest_state = 'RUNNING' THEN 7
                          WHEN latest_state = 'SETTING_UP_TABLES' THEN 6
                          WHEN latest_state = 'RESETTING' THEN 5
                          WHEN latest_state = 'INITIALIZING' THEN 4
                          WHEN latest_state = 'WAITING_FOR_RESOURCES' THEN 3
-                         WHEN latest_state = 'QUEUED' THEN 2 
-                         WHEN latest_state = 'CREATED' THEN 1 
+                         WHEN latest_state = 'QUEUED' THEN 2
+                         WHEN latest_state = 'CREATED' THEN 1
                          ELSE 0 END) AS latest_state_level,
                   (CASE WHEN event_type = 'create_update' THEN event_timestamp END) AS create_time,
                   (CASE WHEN event_type = 'update_progress' AND latest_state = 'WAITING_FOR_RESOURCES' THEN event_timestamp END) AS queued_time,
@@ -655,7 +654,7 @@ class MonitoringEtlPipeline:
                   event_timestamp AS updated_at,
                   seq_num
             FROM (SELECT pipeline_id,
-                        pipeline_run_id, 
+                        pipeline_run_id,
                         pipeline_run_link,
                         event_timestamp,
                         details:update_progress.state::string AS latest_state,
@@ -753,7 +752,6 @@ class MonitoringEtlPipeline:
         """)
 
     def register_pipeline_status(self, spark: SparkSession):
-        pipeline_runs_status_fqname = f"{self.conf.monitoring_catalog}.{self.conf.monitoring_schema}.{PIPELINE_RUNS_STATUS.name}"
 
         @dlt.view(name=f"{PIPELINE_RUNS_STATUS.name}_cdf")
         def pipeline_runs_status_cdf():
@@ -785,8 +783,8 @@ class MonitoringEtlPipeline:
                    latest_state_level as latest_pipeline_run_state_level,
                    is_complete as latest_pipeline_run_is_complete,
                    -- use an empty strings so that it overwrites any errors from previous runs
-                   ifnull(latest_error_log_message, '') AS latest_error_log_message, 
-                   ifnull(latest_error_message, '') AS latest_error_message, 
+                   ifnull(latest_error_log_message, '') AS latest_error_log_message,
+                   ifnull(latest_error_message, '') AS latest_error_message,
                    ifnull(latest_error_code, '') AS latest_error_code,
                    (CASE WHEN latest_error_log_message is not NULL AND latest_error_log_message != '' THEN updated_at END) as latest_error_time,
                    null as latest_successful_run_id,
@@ -837,7 +835,7 @@ class MonitoringEtlPipeline:
                   create_time as latest_successful_run_create_time,
                   end_time as latest_successful_run_end_time,
                   null as latest_failed_run_id,
-                  null as latest_failed_run_link,                  
+                  null as latest_failed_run_link,
                   null as latest_failed_run_create_time,
                   null as latest_failed_run_end_time,
                   null as latest_failed_run_error_log_message,
@@ -928,11 +926,11 @@ class MonitoringEtlPipeline:
 
     def _get_events_table_metrics_sql(self):
         return f"""
-          SELECT pipeline_id, 
-                 pipeline_run_id, 
+          SELECT pipeline_id,
+                 pipeline_run_id,
                  pipeline_run_link,
                  flow_name,
-                 table_name, 
+                 table_name,
                  event_timestamp,
                  details:flow_progress.metrics.num_output_rows::bigint as num_output_rows,
                  details:flow_progress.metrics.backlog_bytes::bigint as backlog_bytes,
@@ -944,18 +942,18 @@ class MonitoringEtlPipeline:
                  details:flow_progress.metrics.num_upserted_rows::bigint as num_upserted_rows,
                  details:flow_progress.metrics.num_deleted_rows::bigint as num_deleted_rows,
                  details:flow_progress.metrics.num_output_bytes::bigint as num_output_bytes,
-                 (CASE WHEN details:flow_progress.metrics.num_output_rows::bigint IS NULL 
+                 (CASE WHEN details:flow_progress.metrics.num_output_rows::bigint IS NULL
                            AND details:flow_progress.metrics.num_upserted_rows::bigint IS NULL
                            AND details:flow_progress.metrics.num_deleted_rows::bigint IS NULL THEN NULL
                        ELSE ifnull(details:flow_progress.metrics.num_output_rows::bigint, 0)
-                           + ifnull(details:flow_progress.metrics.num_upserted_rows::bigint, 0) 
+                           + ifnull(details:flow_progress.metrics.num_upserted_rows::bigint, 0)
                            + ifnull(details:flow_progress.metrics.num_deleted_rows::bigint, 0) END) AS num_written_rows,
                  details:flow_progress.streaming_metrics.event_time.min::timestamp AS min_event_time,
                  details:flow_progress.streaming_metrics.event_time.max::timestamp AS max_event_time,
                  details:flow_progress.data_quality.dropped_records::bigint as num_expectation_dropped_records{Constants.sql_fields_def_extension_point}
           FROM STREAM(`{EVENT_LOGS_BRONZE.name}`)
           WHERE table_name is not null
-                AND (details:flow_progress.metrics IS NOT NULL 
+                AND (details:flow_progress.metrics IS NOT NULL
                      OR details:flow_progress.streaming_metrics IS NOT NULL
                      OR details:flow_progress.data_quality IS NOT NULL)
                      """
@@ -975,8 +973,8 @@ class MonitoringEtlPipeline:
           SELECT *,
                  ('<span style="color:' || latest_state_color || ';">' || latest_state || '</span>') as latest_state_with_color
           FROM (SELECT *,
-                  (CASE WHEN latest_state = 'FAILED' THEN 100 
-                        WHEN latest_state = 'SKIPPED' THEN 50 
+                  (CASE WHEN latest_state = 'FAILED' THEN 100
+                        WHEN latest_state = 'SKIPPED' THEN 50
                         WHEN latest_state = 'STOPPED' THEN 13
                         WHEN latest_state = 'EXCLUDED' THEN 12
                         WHEN latest_state = 'IDLE' THEN 11
@@ -1156,8 +1154,8 @@ class MonitoringEtlPipeline:
                            sum(ifnull(num_written_rows, 0)) AS latest_pipeline_run_num_written_rows
                     FROM {EVENTS_TABLE_METRICS.name}
                     GROUP BY 1, 2, 3
-                  ) AS etm 
-                  ON s.pipeline_id = etm.pipeline_id 
+                  ) AS etm
+                  ON s.pipeline_id = etm.pipeline_id
                      AND s.latest_pipeline_run_id = etm.pipeline_run_id
                      AND s.table_name = etm.table_name
           """)

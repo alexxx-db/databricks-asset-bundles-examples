@@ -1,5 +1,6 @@
 import numpy as np
-from mlflow.models import make_metric, MetricThreshold
+from mlflow.models import MetricThreshold, make_metric
+
 
 # Custom metrics to be included. Return empty list if custom metrics are not needed.
 # Please refer to custom_metrics parameter in mlflow.evaluate documentation https://mlflow.org/docs/latest/python_api/mlflow.html#mlflow.evaluate

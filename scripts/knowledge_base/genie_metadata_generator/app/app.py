@@ -51,24 +51,24 @@ inject_app_styles()
 def initialize_session_state():
     """Initialize session state variables via StateManager."""
     state = get_state_manager()
-    
+
     if '_initialized' not in st.session_state:
         session_info = state.get_session_summary()
         logger.info(f"Session initialized for user: {session_info['user']}")
         logger.info(f"Session key: {session_info['session_key']}")
         logger.info(f"Lakebase enabled: {config.lakebase_enabled}")
-        
+
         # Log Lakebase connection status and ensure tables exist
         if config.lakebase_enabled:
             try:
-                from state.db import get_connection_status, get_persistence_service
+                from state.db import get_connection_status
                 from state.schema import ensure_genify_schema_exists
                 from state.db import get_lakebase_connection_safe
-                
+
                 status = get_connection_status()
                 if status.get('connected'):
                     logger.info(f"Lakebase connected: database={status.get('database')}, user={status.get('user')}, host={status.get('host')}")
-                    
+
                     # Proactively ensure all database tables exist at app startup
                     try:
                         conn = get_lakebase_connection_safe()
@@ -83,7 +83,7 @@ def initialize_session_state():
                 logger.error(f"Lakebase connection check failed: {e}")
         else:
             logger.info("Lakebase disabled - using in-memory session state")
-        
+
         st.session_state._initialized = True
 
 
@@ -91,7 +91,7 @@ def render_sidebar():
     """Render the sidebar with logo, history, settings, and tips."""
     state = get_state_manager()
     workflow_step = state.get_workflow_step()
-    
+
     with st.sidebar:
         # Logo at the top - Large and prominent with Material icon
         st.markdown('''
@@ -103,26 +103,26 @@ def render_sidebar():
                 <p style="font-size: 16px; margin-top: 0.5rem; margin-bottom: 0;" class="genify-tagline">Metadata generator for Unity Catalog</p>
             </div>
         ''', unsafe_allow_html=True)
-        
+
         st.divider()
-        
+
         # Interview Status Indicator - show if interview in progress
         table_interview = state.get_table_interview()
         genie_interview = state.get_genie_interview()
-        
+
         if table_interview or genie_interview:
             st.warning("⚠️ Interview in Progress", icon=":material/edit_note:")
-            
+
             interview_type = "Table" if table_interview else "Genie"
             active_interview = table_interview or genie_interview
-            
+
             # Show progress
             current = active_interview.current_section_idx + 1
             total = len(active_interview.sections)
             progress_pct = int((current / total) * 100)
-            
+
             st.caption(f"{interview_type} Interview: Section {current}/{total} ({progress_pct}%)")
-            
+
             if st.button("▶️ Continue Interview", type="primary", use_container_width=True, key="sidebar_continue"):
                 if table_interview:
                     st.session_state['selected_page'] = 'Document'
@@ -131,36 +131,36 @@ def render_sidebar():
                     st.session_state['selected_page'] = 'Genie'
                     st.session_state['interview_resumed'] = True
                 st.rerun()
-            
+
             st.divider()
-        
+
         # Queue Status Widget - show if queue has items
         table_queue = state.get_table_queue()
         if table_queue:
             st.info(f"📋 Queue: {len(table_queue)} tables", icon=":material/list:")
             st.caption("Tables ready for documentation")
-            
+
             if st.button("View Queue", use_container_width=True, key="sidebar_view_queue"):
                 st.session_state['selected_page'] = 'Select'
                 st.rerun()
-            
+
             st.divider()
-        
+
         # Save Progress button - always visible
         render_save_progress_button()
-        
+
         st.divider()
-        
+
         # History panel
         render_history_panel()
-        
+
         st.divider()
-        
+
         # Settings panel
         render_settings_panel()
-        
+
         st.divider()
-        
+
         # Context tips
         render_tips(workflow_step)
 
@@ -168,10 +168,10 @@ def render_sidebar():
 def render_page_content(page: str):
     """Render the content for the selected page."""
     state = get_state_manager()
-    
+
     if page == "Select":
         render_table_browser()
-    
+
     elif page == "Document":
         table_queue = state.get_table_queue()
         if table_queue:
@@ -179,7 +179,7 @@ def render_page_content(page: str):
         else:
             st.info("Add tables to queue first")
             st.caption("Go to the Select page to browse Unity Catalog and add tables to your queue.")
-            
+
             with st.expander("How to get started", icon=":material/lightbulb:"):
                 st.markdown("""
                 1. Select a **Catalog** and **Schema** from the dropdowns
@@ -187,7 +187,7 @@ def render_page_content(page: str):
                 3. Optionally generate **data profiles** for better interviews
                 4. Click **Start Documenting** to begin
                 """)
-    
+
     elif page == "Review":
         completed_tables = state.get_completed_tables()
         if completed_tables:
@@ -195,11 +195,11 @@ def render_page_content(page: str):
         else:
             st.info("No tables documented yet")
             st.caption("Complete the Document step to review your table comments here.")
-    
+
     elif page == "Genie":
         # Always render Genie interview - it handles both cases (with/without tables)
         render_genie_interview_unified()
-    
+
     elif page == "Export":
         completed_tables = state.get_completed_tables()
         if completed_tables:
@@ -207,13 +207,13 @@ def render_page_content(page: str):
         else:
             st.info("Nothing to export yet")
             st.caption("Complete documenting tables to export your YAML files.")
-    
+
     elif page == "Editor":
         render_yaml_editor_page()
-    
+
     elif page == "Library":
         render_library_panel()
-    
+
     elif page == "Help":
         render_help_page()
 
@@ -252,7 +252,7 @@ def render_tips(workflow_step: str):
 - Follow usage instructions
         """
     }
-    
+
     tip = tips.get(workflow_step)
     if tip:
         if workflow_step == 'export':
@@ -267,9 +267,9 @@ def main():
     initialize_session_state()
     state = get_state_manager()
     workflow_step = state.get_workflow_step()
-    
+
     # Edit workflows are now handled through the unified Editor page
-    
+
     # Define navigation pages with Material icons
     page_icons = {
         "Select": ":material/folder_open:",
@@ -282,7 +282,7 @@ def main():
         "Help": ":material/help:"  # Help & How To
     }
     pages = list(page_icons.keys())
-    
+
     # Map workflow to page for default selection
     workflow_to_page = {
         'browse': 'Select',
@@ -293,23 +293,23 @@ def main():
         'library': 'Library',
         'help': 'Help'
     }
-    
+
     # Initialize selected page in session state if not set
     if 'selected_page' not in st.session_state:
         st.session_state.selected_page = workflow_to_page.get(workflow_step, 'Select')
-    
+
     # Render pills navigation
     st.markdown('<div class="pills-nav-container">', unsafe_allow_html=True)
     cols = st.columns(len(pages))
-    
+
     for idx, (col, page_name) in enumerate(zip(cols, pages)):
         with col:
             icon = page_icons[page_name]
             is_active = st.session_state.selected_page == page_name
-            
+
             # Use custom button styling based on active state
             button_type = "primary" if is_active else "secondary"
-            
+
             if st.button(
                 f"{icon} {page_name}",
                 key=f"nav_pill_{page_name}",
@@ -319,13 +319,13 @@ def main():
             ):
                 st.session_state.selected_page = page_name
                 st.rerun()
-    
+
     st.markdown('</div>', unsafe_allow_html=True)
     st.markdown('<div class="nav-spacer"></div>', unsafe_allow_html=True)
-    
+
     # Render sidebar with history and settings
     render_sidebar()
-    
+
     # Render content for the selected page
     render_page_content(st.session_state.selected_page)
 

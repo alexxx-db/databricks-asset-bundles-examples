@@ -13,12 +13,11 @@ We test:
 from __future__ import annotations
 
 import time
+
 import pytest
 import responses as resp_lib
-from responses import matchers
 
-from iceberg_catalog.polaris_client import PolarisClient, IcebergTableSummary
-
+from iceberg_catalog.polaris_client import IcebergTableSummary, PolarisClient
 
 # ── Fixtures ──────────────────────────────────────────────────────────────────
 
