@@ -4,7 +4,6 @@ Common observability classes and functions.
 
 import json
 import logging
-from pyspark.sql import SparkSession
 import os
 import re
 from typing import List, Optional
@@ -12,6 +11,7 @@ from typing import List, Optional
 from databricks.sdk import WorkspaceClient
 from databricks.sdk.service.dashboards import Dashboard
 from databricks.sdk.service.sql import State
+from pyspark.sql import SparkSession
 
 
 def parse_comma_separated_list(s: Optional[str]) -> List[str]:
@@ -526,6 +526,7 @@ class PipelineTagsIndexBuilder:
         The index maps tag:value pairs to lists of pipeline IDs.
         """
         from datetime import datetime
+
         from pyspark.sql import Row
 
         self.log.info(f"Building pipeline tags index in table: {self.index_table_fqn}")

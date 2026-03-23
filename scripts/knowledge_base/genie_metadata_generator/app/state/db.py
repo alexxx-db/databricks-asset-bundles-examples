@@ -14,8 +14,8 @@ a database resource is added:
 
 See: https://docs.databricks.com/aws/en/dev-tools/databricks-apps/lakebase
 """
-import os
 import logging
+import os
 from typing import Optional
 
 logger = logging.getLogger(__name__)

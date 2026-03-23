@@ -1,9 +1,9 @@
 from databricks.bundles.jobs import (
-    Job,
-    Task,
-    NotebookTask,
     ConditionTask,
     ConditionTaskOp,
+    Job,
+    NotebookTask,
+    Task,
     TaskDependency,
 )
 

@@ -3,13 +3,14 @@
 # It makes sure all 'assets/*' directories are added to `sys.path` so that
 # tests can import them.
 import os
-import sys
-import dlt
 import pathlib
-import pytest
+import sys
 import warnings
-from pyspark.sql import SparkSession
+
+import dlt
+import pytest
 from databricks.connect import DatabricksSession
+from pyspark.sql import SparkSession
 
 # Dynamically find and add all `assets/*` directories to `sys.path`
 for path in pathlib.Path(pathlib.Path(__file__).parent / "assets").glob("*"):

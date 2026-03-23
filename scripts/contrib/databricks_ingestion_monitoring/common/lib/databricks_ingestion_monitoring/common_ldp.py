@@ -2,14 +2,14 @@
 Common observability functions to be used within SDP pipelines.
 """
 
-from collections import namedtuple
 import logging
+from collections import namedtuple
 from typing import Callable, Dict, Iterable, Set
 
 import dlt
 from databricks.sdk import WorkspaceClient
 from databricks.sdk.errors.platform import ResourceDoesNotExist
-from pyspark.sql import SparkSession, DataFrame
+from pyspark.sql import DataFrame, SparkSession
 
 from .common import parse_comma_separated_list
 from .standard_tables import (
@@ -24,8 +24,8 @@ from .standard_tables import (
     PIPELINES_STATUS,
     PIPELINES_STATUS_SILVER,
     TABLE_EVENTS_EXPECTATION_CHECKS,
-    TABLE_STATUS_PER_PIPELINE_RUN,
     TABLE_STATUS,
+    TABLE_STATUS_PER_PIPELINE_RUN,
 )
 
 
@@ -220,7 +220,7 @@ class MonitoringEtlPipeline:
         Registers pipelines that match ANY of the specified tag:value pairs for monitoring.
         :param tags_str: Comma-separated list of tag:value pairs (e.g., "env:prod,team:data")
         """
-        from .common import parse_tag_value_pairs, get_pipeline_ids_by_tags
+        from .common import get_pipeline_ids_by_tags, parse_tag_value_pairs
 
         tag_groups = parse_tag_value_pairs(tags_str)
         if not tag_groups:

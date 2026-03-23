@@ -1,7 +1,7 @@
-import dlt
-import sys
 import logging
+import sys
 
+import dlt
 from pyspark.sql import SparkSession
 
 sys.path.append("../../common/lib")

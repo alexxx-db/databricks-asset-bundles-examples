@@ -3,9 +3,10 @@ Configuration module for Genify App.
 Loads settings from app.yaml with environment variable overrides.
 """
 
-import yaml
 import os
 from pathlib import Path
+
+import yaml
 
 
 class AppConfig:

@@ -1,7 +1,7 @@
 import os
 
 from databricks.sdk import WorkspaceClient
-from flask import Flask, render_template, redirect, url_for
+from flask import Flask, redirect, render_template, url_for
 
 app = Flask(__name__)
 

@@ -4,29 +4,30 @@ Reusable component for section-based interviews with live YAML preview.
 Material Design styling with flat icons.
 """
 
-import streamlit as st
 import logging
-from llm.section_interview import SectionBasedInterview
+
+import streamlit as st
 from llm.client import LLMRateLimitError, LLMTimeoutError
-from state import get_state_manager, TableIdentifier
+from llm.section_interview import SectionBasedInterview
+from state import TableIdentifier, get_state_manager
 from state.services import get_interview_service
-from utils.data_conversion import library_yaml_to_table_data
 from ui.constants import (
-    BUTTON_BACK_TO_SELECT,
-    BUTTON_BACK_TO_REVIEW,
-    BUTTON_CONTINUE,
     BUTTON_ADD_MORE_TABLES,
+    BUTTON_BACK_TO_REVIEW,
+    BUTTON_BACK_TO_SELECT,
+    BUTTON_COMPLETE_SECTION,
+    BUTTON_CONTINUE,
+    BUTTON_CONTINUE_INTERVIEW,
+    BUTTON_GENERATE_YAML,
     BUTTON_SAVE_PROGRESS,
     BUTTON_SKIP_SECTION,
-    BUTTON_COMPLETE_SECTION,
-    BUTTON_GENERATE_YAML,
-    BUTTON_CONTINUE_INTERVIEW,
     BUTTON_START_FRESH,
     ICON_BACK,
-    ICON_FORWARD
+    ICON_FORWARD,
 )
-from ui.utils.formatting import format_table_count
 from ui.content.help_content import INTERVIEW_TIPS
+from ui.utils.formatting import format_table_count
+from utils.data_conversion import library_yaml_to_table_data
 
 logger = logging.getLogger(__name__)
 
@@ -210,9 +211,9 @@ def start_genie_interview(completed_tables: list, source: str = 'current'):
 @st.dialog("Select Tables from Library", icon=":material/library_books:")
 def _show_library_selection_dialog():
     """Dialog for selecting multiple table YAMLs from library to build Genie space."""
+    from config import config
     from state import get_state_manager
     from state.services import get_library_service
-    from config import config
 
     state = get_state_manager()
 

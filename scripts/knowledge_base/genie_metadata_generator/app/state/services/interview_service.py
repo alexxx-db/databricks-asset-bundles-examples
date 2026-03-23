@@ -5,9 +5,11 @@ Single source of truth for interview operations with proper state coordination.
 """
 import logging
 from typing import Optional
-from state import StateManager
-from llm.section_interview import SectionBasedInterview
+
 from llm.client import LLMClient
+from llm.section_interview import SectionBasedInterview
+from state import StateManager
+
 from .context_summarizer_service import ContextSummarizerService
 
 logger = logging.getLogger(__name__)
@@ -436,6 +438,7 @@ class InterviewService:
             True if successful, False otherwise
         """
         from datetime import datetime
+
         from state import TableIdentifier
 
         try:
@@ -539,6 +542,7 @@ def get_interview_service(state_manager: StateManager) -> InterviewService:
         InterviewService instance
     """
     import streamlit as st
+
     from .context_summarizer_service import get_context_summarizer_service
 
     # Cache the service instance per session

@@ -10,10 +10,11 @@ Uses HTTP headers forwarded by Databricks Apps reverse proxy:
 
 See: https://docs.databricks.com/aws/en/dev-tools/databricks-apps/http-headers
 """
+import hashlib
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Optional, Dict
-import hashlib
+from typing import Dict, Optional
+
 import streamlit as st
 
 

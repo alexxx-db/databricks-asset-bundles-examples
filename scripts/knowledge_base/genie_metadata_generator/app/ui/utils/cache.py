@@ -4,9 +4,10 @@ Caching utilities for Streamlit UI components.
 Provides session-state based caching with TTL and invalidation support.
 """
 
-import streamlit as st
-from typing import Any, Callable, Optional, List
 import time
+from typing import Any, Callable, List, Optional
+
+import streamlit as st
 
 
 def cached_state(

@@ -4,10 +4,11 @@ Profile service for table profiling operations.
 Single source of truth for profile generation and caching.
 """
 import logging
-from typing import Optional, Dict, Tuple
-from state import StateManager, TableIdentifier
-from data.profiler import get_table_profile
+from typing import Dict, Optional, Tuple
+
 from data.profile_formatter import format_profile_for_llm
+from data.profiler import get_table_profile
+from state import StateManager, TableIdentifier
 
 logger = logging.getLogger(__name__)
 

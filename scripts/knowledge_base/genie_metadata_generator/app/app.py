@@ -6,19 +6,20 @@ Uses streamlit-navigation-bar for workflow navigation and sidebar for history.
 Material Design inspired UI with flat monochrome icons.
 """
 
+import logging
+
 import streamlit as st
 from config import config
 from state import get_state_manager
-from ui.table_browser import render_table_browser
-from ui.review_panel import render_review
+from ui.components import render_history_panel, render_save_progress_button, render_settings_panel
 from ui.export_panel import render_export
-from ui.yaml_library_panel import render_library_panel
-from ui.split_screen_interview import render_table_interview_unified, render_genie_interview_unified
-from ui.yaml_editor_page import render_yaml_editor_page
 from ui.help_page import render_help_page
-from ui.components import render_history_panel, render_settings_panel, render_save_progress_button
+from ui.review_panel import render_review
+from ui.split_screen_interview import render_genie_interview_unified, render_table_interview_unified
 from ui.styles import inject_app_styles
-import logging
+from ui.table_browser import render_table_browser
+from ui.yaml_editor_page import render_yaml_editor_page
+from ui.yaml_library_panel import render_library_panel
 
 # Configure logging for the app
 logging.basicConfig(
@@ -61,9 +62,8 @@ def initialize_session_state():
         # Log Lakebase connection status and ensure tables exist
         if config.lakebase_enabled:
             try:
-                from state.db import get_connection_status
+                from state.db import get_connection_status, get_lakebase_connection_safe
                 from state.schema import ensure_genify_schema_exists
-                from state.db import get_lakebase_connection_safe
 
                 status = get_connection_status()
                 if status.get('connected'):

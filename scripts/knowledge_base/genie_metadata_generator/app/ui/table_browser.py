@@ -4,21 +4,22 @@ Browse Unity Catalog: catalog -> schema -> table
 Material Design styling with flat icons.
 """
 
-import streamlit as st
 import logging
-from state import get_state_manager, TableIdentifier
+
+import streamlit as st
+from state import TableIdentifier, get_state_manager
 from state.services import get_catalog_service, get_profile_service
 from ui.constants import (
     BUTTON_CLEAR_QUEUE,
     BUTTON_GENERATE_PROFILE,
-    BUTTON_START_INTERVIEW,
     BUTTON_START_DOCUMENTING,
-    ICON_DELETE,
+    BUTTON_START_INTERVIEW,
     ICON_ANALYTICS,
-    ICON_FORWARD
+    ICON_DELETE,
+    ICON_FORWARD,
 )
-from ui.utils.formatting import format_table_count, format_time_estimate
 from ui.content.help_content import GETTING_STARTED_GUIDE
+from ui.utils.formatting import format_table_count, format_time_estimate
 
 logger = logging.getLogger(__name__)
 

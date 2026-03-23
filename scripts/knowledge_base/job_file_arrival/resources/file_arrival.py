@@ -1,9 +1,9 @@
 from databricks.bundles.jobs import (
     FileArrivalTriggerConfiguration,
     Job,
+    NotebookTask,
     Task,
     TriggerSettings,
-    NotebookTask,
 )
 
 process_files = Task(

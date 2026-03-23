@@ -9,9 +9,10 @@ Usage:
 """
 
 import streamlit as st
-from .theme import THEME_CSS
-from .layout import LAYOUT_CSS
+
 from .components import COMPONENT_CSS
+from .layout import LAYOUT_CSS
+from .theme import THEME_CSS
 
 
 def inject_app_styles():

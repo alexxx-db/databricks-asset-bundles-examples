@@ -4,7 +4,8 @@ Handles all interactions with the relational database schema.
 """
 import json
 import logging
-from typing import List, Dict, Optional
+from typing import Dict, List, Optional
+
 from .schema import ensure_genify_schema_exists
 
 logger = logging.getLogger(__name__)

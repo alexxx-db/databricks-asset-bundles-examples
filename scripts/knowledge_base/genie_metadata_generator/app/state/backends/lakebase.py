@@ -13,6 +13,7 @@ See: https://apps-cookbook.dev/docs/fastapi/building_endpoints/lakebase/
 import json
 import logging
 from typing import Any, List
+
 from .base import StateBackend
 
 logger = logging.getLogger(__name__)

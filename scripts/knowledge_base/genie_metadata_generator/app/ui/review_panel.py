@@ -5,16 +5,12 @@ Material Design styling with flat icons.
 """
 
 import streamlit as st
-from state import get_state_manager, TableIdentifier
-from ui.utils.navigation import render_back_button
-from ui.utils.cache import cached_state
-from ui.constants import (
-    BUTTON_ADD_MORE_TABLES,
-    BUTTON_BACK_TO_SELECT,
-    ICON_ADD
-)
-from ui.utils.formatting import format_completed_status
+from state import TableIdentifier, get_state_manager
+from ui.constants import BUTTON_ADD_MORE_TABLES, BUTTON_BACK_TO_SELECT, ICON_ADD
 from ui.content.help_content import WHATS_NEXT_REVIEW
+from ui.utils.cache import cached_state
+from ui.utils.formatting import format_completed_status
+from ui.utils.navigation import render_back_button
 
 
 def render_review():

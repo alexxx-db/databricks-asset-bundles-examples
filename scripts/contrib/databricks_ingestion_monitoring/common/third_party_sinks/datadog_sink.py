@@ -4,26 +4,27 @@ Datadog Sink for Monitoring ETL Pipeline.
 For configuration details, refer to README-third-party-monitoring.md
 """
 
+import gzip
 import json
 import logging
-import requests
-import gzip
-from typing import Dict, Any, Optional
-from tenacity import retry, stop_after_delay, wait_exponential
 from datetime import datetime, timezone
-from pyspark.sql.types import StringType, ArrayType
+from typing import Any, Dict, Optional
+
+import dlt
+import requests
 from pyspark.sql.functions import (
-    lit,
     col,
     collect_list,
     concat,
-    expr,
-    udf,
-    struct,
     explode,
+    expr,
+    lit,
     regexp_replace,
+    struct,
+    udf,
 )
-import dlt
+from pyspark.sql.types import ArrayType, StringType
+from tenacity import retry, stop_after_delay, wait_exponential
 
 # Global Configuration.
 SERVICE_NAME = "databricks-lakeflow-connect"

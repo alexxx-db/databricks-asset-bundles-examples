@@ -13,13 +13,14 @@ Backends:
     - LakebaseBackend: PostgreSQL (persistent) - enabled via config
 """
 
-from .manager import StateManager
-from .backends.session import SessionStateBackend
-from .context import SessionContext, get_session_context, get_user_email
-from .models import TableIdentifier
+import logging
 
 import streamlit as st
-import logging
+
+from .backends.session import SessionStateBackend
+from .context import SessionContext, get_session_context, get_user_email
+from .manager import StateManager
+from .models import TableIdentifier
 
 logger = logging.getLogger(__name__)
 

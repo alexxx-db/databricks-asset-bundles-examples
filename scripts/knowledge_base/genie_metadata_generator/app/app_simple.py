@@ -3,14 +3,15 @@ Description Agent - Simplified UI with Genify Backend
 AI-powered description generator for Databricks Unity Catalog tables and columns.
 """
 
-import streamlit as st
 import logging
 from typing import Optional, Tuple
-from llm.client import get_main_llm_client
+
+import streamlit as st
 from auth.service_principal import get_sql_connection
 from data.information_schema import get_columns_for_table
-from state.services.profile_service import get_profile_service, ProfileService
+from llm.client import get_main_llm_client
 from state import get_state_manager
+from state.services.profile_service import ProfileService, get_profile_service
 
 # Configure logging
 logging.basicConfig(

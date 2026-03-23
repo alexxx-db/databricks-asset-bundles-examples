@@ -1,11 +1,12 @@
 """
 Centralized state management for Genify.
 """
-from typing import Optional, List, Dict
+import logging
+from typing import Dict, List, Optional
+
 from .backends.base import StateBackend
 from .context import SessionContext
 from .models import TableIdentifier
-import logging
 
 logger = logging.getLogger(__name__)
 
@@ -518,8 +519,8 @@ class StateManager:
         """
         try:
             from config import config
-            from state.db import get_persistence_service
             from llm.section_interview import SectionBasedInterview
+            from state.db import get_persistence_service
 
             if not config.lakebase_enabled:
                 logger.warning("Cannot restore session: Lakebase not enabled")
@@ -554,8 +555,8 @@ class StateManager:
             self.set_workflow_step(data['workflow_step'])
 
             # Deserialize table interview if exists
-            from state.services import get_context_summarizer_service
             from config import config
+            from state.services import get_context_summarizer_service
 
             llm = self._create_llm_client()
 

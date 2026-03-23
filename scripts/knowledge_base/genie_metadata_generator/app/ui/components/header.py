@@ -6,8 +6,8 @@ Save Progress functionality has been moved to Session History panel.
 """
 
 import streamlit as st
-from state import get_state_manager
 from config import config
+from state import get_state_manager
 
 
 def _get_lakebase_status() -> tuple[str, str]:

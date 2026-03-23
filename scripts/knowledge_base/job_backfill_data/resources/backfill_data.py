@@ -1,9 +1,9 @@
 from databricks.bundles.jobs import (
     Job,
-    Task,
+    JobParameterDefinition,
     SqlTask,
     SqlTaskFile,
-    JobParameterDefinition,
+    Task,
 )
 
 run_daily_sql = Task(

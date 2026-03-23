@@ -13,14 +13,10 @@ While this creates a dependency on the UI framework, it's acceptable because:
 For a pure framework-agnostic approach, consider using functools.lru_cache with
 a custom cache invalidation strategy, but this adds complexity for minimal benefit.
 """
+from typing import Dict, List, Optional, Tuple
+
 import streamlit as st
-from typing import List, Tuple, Optional, Dict
-from data.information_schema import (
-    list_catalogs,
-    list_schemas,
-    list_tables,
-    build_table_context
-)
+from data.information_schema import build_table_context, list_catalogs, list_schemas, list_tables
 
 
 class CatalogService:

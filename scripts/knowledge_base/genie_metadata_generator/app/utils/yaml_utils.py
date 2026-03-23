@@ -2,9 +2,10 @@
 YAML validation and manipulation utilities.
 Atomic functions for YAML operations across the app.
 """
-import yaml
 import logging
-from typing import Tuple, Optional
+from typing import Optional, Tuple
+
+import yaml
 
 logger = logging.getLogger(__name__)
 

@@ -3,11 +3,12 @@ LLM client for Databricks Foundation Models and Serving Endpoints.
 Reference: https://docs.databricks.com/en/machine-learning/foundation-models/index.html
 """
 
-from databricks.sdk import WorkspaceClient
-from databricks.sdk.service.serving import ChatMessage, ChatMessageRole
-import streamlit as st
 import logging
 import time
+
+import streamlit as st
+from databricks.sdk import WorkspaceClient
+from databricks.sdk.service.serving import ChatMessage, ChatMessageRole
 
 # Configure logger for LLM calls
 logger = logging.getLogger(__name__)

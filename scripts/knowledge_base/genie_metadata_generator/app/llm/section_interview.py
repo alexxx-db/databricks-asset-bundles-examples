@@ -3,10 +3,11 @@ Generic Section-Based Interview Engine
 Handles interviews for any template split into sections.
 """
 
-import yaml
 import logging
+from datetime import date, datetime
 from pathlib import Path
-from datetime import datetime, date
+
+import yaml
 from llm.client import LLMClient
 
 logger = logging.getLogger(__name__)

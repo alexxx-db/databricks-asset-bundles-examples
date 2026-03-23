@@ -11,9 +11,9 @@ When running in Databricks Apps, these environment variables are automatically a
 See: https://docs.databricks.com/aws/en/dev-tools/databricks-apps/system-env#default-environment-variables
 """
 
+import streamlit as st
 from databricks import sql
 from databricks.sdk.core import Config
-import streamlit as st
 
 
 @st.cache_resource(ttl=300, show_spinner="Connecting to Databricks...")

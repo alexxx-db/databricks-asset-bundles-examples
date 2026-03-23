@@ -2,9 +2,10 @@
 Workflow navigation utilities.
 Atomic functions for managing workflow state and navigation.
 """
-import streamlit as st
 import logging
 from typing import Optional
+
+import streamlit as st
 
 logger = logging.getLogger(__name__)
 
