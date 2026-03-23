@@ -2,5 +2,54 @@
 # Subdirectories must use their own .gitignore file to make sure
 # that they are complete and can be used outside this repository.
 
+# ─── IDE / Editor ────────────────────────────────────────────────────────────
 /.ruff_cache
 /.vscode
+/.idea
+*.swp
+*.swo
+*~
+
+# ─── OS Cruft ────────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+Desktop.ini
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+[Dd]esktop.ini
+
+# ─── Python ──────────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.pyo
+*.egg-info/
+dist/
+build/
+*.egg
+
+# ─── AI Coding Assistants — Skills, Configs, and Dev Kits ───────────────────
+
+# Claude Code
+.claude/
+CLAUDE.md
+
+# Gemini CLI
+.gemini/
+GEMINI.md
+
+# OpenAI Codex CLI
+.codex/
+
+# GitHub Copilot / Agents
+.agents/
+AGENTS.md
+.github/skills/
+.github/copilot-instructions.md
+
+# Cursor
+.cursor/
+
+# Databricks AI Dev Kit (installs skills into the above directories)
+.ai-dev-kit/
