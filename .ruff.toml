@@ -1,3 +1,16 @@
+# Ruff configuration — consolidates settings from pyproject.toml plus formatter config.
+# This file takes precedence over pyproject.toml for ruff, so ALL settings must be here.
+
+target-version = "py311"
+line-length = 120
+exclude = [
+    ".git",
+    "contrib/templates",
+    "scripts/contrib/templates",
+    ".venv",
+    "venv",
+]
+
 [format]
 exclude = [
     # Templates are responsible for formatting at the source.
@@ -6,4 +19,18 @@ exclude = [
     "default_sql/*",
     "mlops_stacks/*",
     "lakeflow_pipelines_python/*",
+]
+
+[lint]
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # Pyflakes
+    "I",   # isort
+    "B",   # flake8-bugbear
+    "C4",  # flake8-comprehensions
+]
+ignore = [
+    "E501",   # line too long (handled by formatter or per-project)
+    "F821",   # undefined name (spark/dbutils injected at runtime in Databricks notebooks)
 ]
