@@ -54,7 +54,7 @@ CREATE OR REPLACE ICEBERG TABLE ICEBERG_LAKEHOUSE.finops.sql_warehouse_spend (
 
 CREATE OR REPLACE ICEBERG TABLE ICEBERG_LAKEHOUSE.subscriber.subscriber_events (
   event_id          VARCHAR(64)   NOT NULL COMMENT 'UUID for the event',
-  subscriber_id     VARCHAR(64)   NOT NULL COMMENT 'DISH subscriber ID',
+  subscriber_id     VARCHAR(64)   NOT NULL COMMENT 'Customer subscriber ID',
   event_type        VARCHAR(64)   NOT NULL COMMENT 'e.g. ACTIVATION, CHURN, UPGRADE',
   event_ts          TIMESTAMP_NTZ NOT NULL COMMENT 'Event timestamp (UTC)',
   product_code      VARCHAR(64)            COMMENT 'Product/package code',
