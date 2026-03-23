@@ -99,7 +99,7 @@ def _get_table_statistics(connection, full_name, catalog, schema, table):
             if detail:
                 # Extract relevant fields (column order may vary)
                 col_names = [desc[0].lower() for desc in cursor.description]
-                detail_dict = dict(zip(col_names, detail))
+                detail_dict = dict(zip(col_names, detail, strict=False))
 
                 stats["format"] = detail_dict.get("format", "UNKNOWN")
                 stats["row_count"] = detail_dict.get("numrows") or detail_dict.get("num_rows")

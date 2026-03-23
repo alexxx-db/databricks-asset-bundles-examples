@@ -144,7 +144,7 @@ def list_conversations_via_audit(limit: int = 100) -> list[dict[str, Any]]:
         )
         schema  = [c.name for c in result.manifest.schema.columns]
         rows    = result.result.data_typed_array or []
-        records = [dict(zip(schema, [v.str for v in r.values])) for r in rows]
+        records = [dict(zip(schema, [v.str for v in r.values], strict=False)) for r in rows]
         return [r for r in records if r.get("conversation_id") and r.get("message_id")]
     except Exception as exc:  # noqa: BLE001
         st.warning(f"Could not query audit log (SELECT on system.access.audit may not be granted): {exc}")

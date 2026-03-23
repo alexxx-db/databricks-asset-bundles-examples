@@ -1102,7 +1102,7 @@ class MonitoringEtlPipeline:
         )
 
         @dlt.view(name=silver_latest_changes_source_view_name)
-        def table_latest_run_processing_state_source():
+        def table_latest_changes_source():
             return spark.sql(f"""
           SELECT pipeline_id,
                  table_name,

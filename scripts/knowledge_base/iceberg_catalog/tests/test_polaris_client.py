@@ -16,6 +16,7 @@ import time
 
 import pytest
 import responses as resp_lib
+from requests.exceptions import HTTPError
 
 from iceberg_catalog.polaris_client import IcebergTableSummary, PolarisClient
 
@@ -86,7 +87,7 @@ def test_token_is_refreshed_when_near_expiry() -> None:
 def test_token_fetch_failure_raises() -> None:
     resp_lib.add(resp_lib.POST, TOKEN_URI, status=401)
     client = _make_client()
-    with pytest.raises(Exception):
+    with pytest.raises(HTTPError):
         client._get_token()
 
 
@@ -177,7 +178,7 @@ def test_load_table_404_raises() -> None:
         status=404,
     )
     client = _make_client()
-    with pytest.raises(Exception):
+    with pytest.raises(HTTPError):
         client.load_table("finops", "nonexistent")
 
 

@@ -144,7 +144,7 @@ class SectionBasedInterview:
 
         count = 0
         if isinstance(data, dict):
-            for key, value in data.items():
+            for _key, value in data.items():
                 if value is not None and value != '' and value != []:
                     if isinstance(value, dict):
                         count += self._count_populated_fields(value, depth + 1)

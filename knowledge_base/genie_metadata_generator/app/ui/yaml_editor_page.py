@@ -61,7 +61,7 @@ def render_yaml_editor_page():
         # If we have a yaml_id to load, find its index
         default_index = 0
         if yaml_id_to_load:
-            for idx, (label, item) in enumerate(yaml_options.items()):
+            for idx, (_label, item) in enumerate(yaml_options.items()):
                 if item['id'] == yaml_id_to_load:
                     default_index = idx
                     break

@@ -799,7 +799,7 @@ def render_split_screen_interview(
 
         # Horizontal section indicators at top
         section_cols = st.columns(len(interview.sections))
-        for idx, (col, section) in enumerate(zip(section_cols, interview.sections)):
+        for idx, (col, section) in enumerate(zip(section_cols, interview.sections, strict=False)):
             with col:
                 section_key = section['key']
 

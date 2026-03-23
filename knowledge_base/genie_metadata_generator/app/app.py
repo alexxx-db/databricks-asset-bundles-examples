@@ -302,7 +302,7 @@ def main():
     st.markdown('<div class="pills-nav-container">', unsafe_allow_html=True)
     cols = st.columns(len(pages))
 
-    for idx, (col, page_name) in enumerate(zip(cols, pages)):
+    for _idx, (col, page_name) in enumerate(zip(cols, pages, strict=False)):
         with col:
             icon = page_icons[page_name]
             is_active = st.session_state.selected_page == page_name

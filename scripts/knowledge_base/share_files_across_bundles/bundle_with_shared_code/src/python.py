@@ -10,7 +10,7 @@ shared_path = os.getcwd() + "/../../shared"
 sys.path.append(shared_path)
 
 # Import a function from the library in the shared directory.
-from shared_library import multiply
+from shared_library import multiply  # noqa: E402
 
 # Use the function.
 result = multiply(2, 3)
