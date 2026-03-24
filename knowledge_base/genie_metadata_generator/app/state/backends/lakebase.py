@@ -14,7 +14,7 @@ import json
 import logging
 from typing import Any, List
 
-from utils.sql_identifiers import validate_identifier
+from app.utils.sql_identifiers import validate_identifier
 
 from .base import StateBackend
 
