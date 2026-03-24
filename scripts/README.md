@@ -1,10 +1,22 @@
 # Scripts
 
-Canonical scripts for maintaining this repo. Run from the **repository root** unless noted.
+CI and maintenance tooling for this repo. Run from the **repository root** unless noted.
 
-## Relationship to repo root
+## discover_bundle_dirs.py
 
-Some directories under `scripts/` (e.g. `knowledge_base/`, `contrib/`) mirror or duplicate structure from the repository root. They are used by tooling such as `update_from_templates.sh` or by CI that may run from different working directories. **The canonical source for bundle examples is at the repository root** (e.g. `knowledge_base/`, `default_python/`). When editing examples or fixing bugs, prefer changing files at the root; keep the `scripts/` mirror in sync when the same content is maintained in both places (see main [README](../README.md) and [CONTRIBUTING.md](../CONTRIBUTING.md)).
+Discovers all bundle root directories (directories containing a valid `databricks.yml` with `bundle.name`). Also validates bundle schemas when called with `--validate`.
+
+**Requirements:** `pip install pyyaml`
+
+**Usage:**
+```bash
+python scripts/discover_bundle_dirs.py              # print one dir per line
+python scripts/discover_bundle_dirs.py --json        # JSON array for GitHub Actions
+python scripts/discover_bundle_dirs.py --validate    # validate all databricks.yml files
+python scripts/discover_bundle_dirs.py --validate -q # quiet mode (errors only)
+```
+
+---
 
 ## update_from_templates.sh
 
@@ -16,10 +28,6 @@ Regenerates template-generated bundle directories using `databricks bundle init`
 ```bash
 ./scripts/update_from_templates.sh [CURRENT_USER_NAME]
 ```
-- If `CURRENT_USER_NAME` is omitted, you will be prompted (e.g. `lennart_kats`).
-- Set `CLI_COMMAND` to use a different Databricks CLI (default: `databricks`).
-
-**Behavior:** Runs `bundle init` for each template, then normalizes generated files (workspace host, user, UUID) so the repo stays generic. Only touches text files (e.g. `.yml`, `.py`, `.md`) to avoid corrupting binaries. Works on macOS and Linux (portable `sed -i`).
 
 ---
 
@@ -32,19 +40,26 @@ Detects drift in template-generated directories by comparing file checksums to a
 ./scripts/check_template_checksums.sh           # compare against recorded checksums
 ./scripts/check_template_checksums.sh --update  # regenerate template_checksums.sha256
 ```
-- **Advisory only** — always exits 0. Uses `sha256sum` (GNU/Linux) or `shasum -a 256` (macOS) when available.
 
 ---
 
-## validate_bundle_schema.py
+## generate_ruff_notebook_excludes.py
 
-Validates that every `databricks.yml` under the repo has a `bundle.name` key. Skips paths under `contrib/templates`.
-
-**Requirements:** `pip install pyyaml`
+Finds Databricks notebook `.py` files (with `# Databricks notebook source` header) for ruff exclusion. These files use magic commands that ruff cannot parse.
 
 **Usage:**
 ```bash
-python scripts/validate_bundle_schema.py [--quiet]
+python scripts/generate_ruff_notebook_excludes.py          # print paths
+python scripts/generate_ruff_notebook_excludes.py --toml   # print as ruff exclude array
 ```
-- **Exit 0:** all checked files valid. **Exit 1:** one or more errors (printed to stderr). **Exit 2:** missing PyYAML or invalid root.
-- `--quiet`: only print errors and the final summary (no per-file OK lines).
+
+---
+
+## local_bundle_validate.sh
+
+Validates all bundles locally with the same logic as CI (no workspace auth required).
+
+**Usage:**
+```bash
+./scripts/local_bundle_validate.sh
+```

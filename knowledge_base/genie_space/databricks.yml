@@ -1,6 +1,12 @@
 bundle:
   name: genie_space
 
+# Share notebook source files from genie_space_full to avoid duplication.
+sync:
+  paths:
+    - ../genie_space_full/src
+    - .
+
 variables:
   # The "warehouse_id" variable is used to reference the warehouse used by the Genie space.
   warehouse_id:
@@ -12,9 +18,6 @@ variables:
   space_title:
     default: "NYC Taxi Trip Explorer"
 
-workspace:
-  host: https://myworkspace.databricks.com
-
 resources:
   jobs:
     deploy_genie_space:
@@ -23,7 +26,7 @@ resources:
       tasks:
         - task_key: deploy
           notebook_task:
-            notebook_path: ./src/deploy_genie_space.py
+            notebook_path: ../genie_space_full/src/deploy_genie_space.py
             base_parameters:
               warehouse_id: "{{job.parameters.warehouse_id}}"
               space_title: "{{job.parameters.space_title}}"
@@ -38,6 +41,8 @@ targets:
   dev:
     default: true
     mode: development
-  prod: {
-    # No overrides
-  }
+    workspace:
+      host: https://myworkspace.databricks.com
+  prod:
+    workspace:
+      host: https://myworkspace.databricks.com

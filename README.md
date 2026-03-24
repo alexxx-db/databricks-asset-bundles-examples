@@ -8,7 +8,7 @@ Install the [Databricks CLI](https://docs.databricks.com/dev-tools/cli/install.h
 
 ## Repository layout
 
-The canonical bundle examples live at the repository root (e.g. `knowledge_base/`, `default_python/`). A `scripts/` directory may contain tooling or a mirror used by some workflows; when in doubt, use paths from the root. CI discovers all bundle directories automatically via `scripts/discover_bundle_dirs.py`, so new examples are validated without updating the workflow.
+The canonical bundle examples live at the repository root (e.g. `knowledge_base/`, `default_python/`). The `scripts/` directory contains CI tooling (`discover_bundle_dirs.py`, `check_template_checksums.sh`, etc.). CI discovers all bundle directories automatically, so new examples are validated without updating the workflow.
 
 ## Template-generated projects
 
@@ -66,7 +66,7 @@ See the [contrib](contrib) directory for community-contributed examples and temp
 
 From the repo root you can run:
 
-- **Linting:** `ruff check .` (config in `pyproject.toml`)
+- **Linting:** `ruff check .` (config in `.ruff.toml`)
 - **Type checking:** `pyright` (optional; config in `pyproject.toml`)
 
 CI runs `yamllint`, Python syntax checks (`py_compile`), and `databricks bundle validate` for all discovered bundles.

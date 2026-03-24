@@ -4,10 +4,9 @@ bundle:
 include:
   - resources/*.yml
 
-workspace:
-  # host: https://myworkspace.cloud.databricks.com
-
 targets:
   dev:
     default: true
     mode: development
+    workspace:
+      # host: https://myworkspace.cloud.databricks.com

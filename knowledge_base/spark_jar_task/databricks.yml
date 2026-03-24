@@ -26,3 +26,8 @@ resources:
             main_class_name: PrintArgs
           libraries:
             - jar: ./print_args/PrintArgs.jar
+
+targets:
+  dev:
+    default: true
+    mode: development

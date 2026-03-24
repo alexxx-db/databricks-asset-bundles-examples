@@ -5,7 +5,7 @@ Thanks for your interest in contributing. This document points you to the right 
 ## Repository layout
 
 - **Canonical examples** live at the repo root: `knowledge_base/`, template-generated dirs (`default_python/`, etc.), and `contrib/`.
-- The `scripts/` directory may contain tooling or a mirror; when in doubt, use paths from the root. CI discovers all bundle directories via `scripts/discover_bundle_dirs.py`.
+- The `scripts/` directory contains CI tooling (`discover_bundle_dirs.py`, `check_template_checksums.sh`, etc.).
 
 See the main [README](README.md) for an overview of template-generated projects and knowledge base examples.
 
@@ -17,7 +17,7 @@ See the main [README](README.md) for an overview of template-generated projects 
 
 ## Code quality and tests
 
-- **Linting:** From the repo root, run `ruff check .` (config in `pyproject.toml`). CI runs ruff on a subset of paths; see [README – Code quality](README.md#code-quality).
+- **Linting:** From the repo root, run `ruff check .` (config in `.ruff.toml`). CI runs ruff on the full repo; see [README – Code quality](README.md#code-quality).
 - **Type checking:** Optional `pyright` from the repo root.
 - **Tests:** See [README – Running tests](README.md#running-tests) for how to run pytest for identifier validation, add_asset, iceberg_catalog, and mlops_stacks.
 - **Bundles:** Ensure every new or modified bundle has a valid `databricks.yml` with `bundle.name`. CI runs `databricks bundle validate` for all discovered bundles.

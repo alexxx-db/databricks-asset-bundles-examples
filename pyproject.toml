@@ -1,30 +1,6 @@
-# Root config for repo-wide tooling (ruff, pyright).
+# Root config for repo-wide tooling (pyright).
+# Ruff config is in .ruff.toml (which takes precedence over pyproject.toml).
 # Individual bundles may have their own pyproject.toml.
-
-[tool.ruff]
-target-version = "py311"
-line-length = 120
-exclude = [
-    ".git",
-    "contrib/templates",
-    "scripts/contrib/templates",
-    ".venv",
-    "venv",
-]
-
-[tool.ruff.lint]
-select = [
-    "E",   # pycodestyle errors
-    "W",   # pycodestyle warnings
-    "F",   # Pyflakes
-    "I",   # isort
-    "B",   # flake8-bugbear
-    "C4",  # flake8-comprehensions
-]
-ignore = [
-    "E501",   # line too long (handled by formatter or per-project)
-    "F821",   # undefined name (spark/dbutils injected at runtime in Databricks notebooks)
-]
 
 [tool.pyright]
 pythonVersion = "3.11"
@@ -34,7 +10,6 @@ reportMissingTypeStubs = false
 # Run from repo root; exclude notebooks and generated/template code
 exclude = [
     "**/contrib/templates",
-    "**/scripts/contrib/templates",
     "**/.venv",
     "**/venv",
 ]

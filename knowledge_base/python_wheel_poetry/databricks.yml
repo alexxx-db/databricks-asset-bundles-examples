@@ -4,9 +4,6 @@ bundle:
 include:
   - ./resources/job.yml
 
-workspace:
-  host: https://myworkspace.databricks.com
-
 artifacts:
   default:
     type: whl
@@ -16,3 +13,5 @@ targets:
   dev:
     default: true
     mode: development
+    workspace:
+      host: https://myworkspace.databricks.com

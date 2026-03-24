@@ -61,9 +61,6 @@ variables:
   alert_email:
     default: "platform-alerts@example.com"
 
-workspace:
-  host: https://myworkspace.databricks.com
-
 targets:
   dev:
     default: true
@@ -85,7 +82,7 @@ targets:
 
   prod:
     workspace:
-      host: https://myworkspace.cloud.databricks.com
+      host: https://myworkspace.databricks.com
     run_as:
       service_principal_name: iceberg-catalog-svc
     variables:

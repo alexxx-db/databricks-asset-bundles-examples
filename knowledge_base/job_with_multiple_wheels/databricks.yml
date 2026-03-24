@@ -4,9 +4,6 @@ bundle:
 include:
   - ./resources/job.yml
 
-workspace:
-  host: https://myworkspace.cloud.databricks.com
-
 artifacts:
   my_custom_wheel1:
     type: whl
@@ -22,3 +19,5 @@ targets:
   dev:
     default: true
     mode: development
+    workspace:
+      host: https://myworkspace.cloud.databricks.com

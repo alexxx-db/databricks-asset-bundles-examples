@@ -35,10 +35,11 @@ dbutils.widgets.text("dry_run",         "false")
 
 import re
 
+# Inline SQL identifier validation (canonical version: genie_metadata_generator/app/utils/sql_identifiers.py)
 _ID_RE = re.compile(r"^[a-zA-Z0-9_]+$")
 def _validate_id(name, kind="identifier"):
-    if not _ID_RE.match(name):
-        raise ValueError(f"{kind} contains invalid characters: {name!r}")
+    if not name or len(name) > 255 or not _ID_RE.match(name):
+        raise ValueError(f"{kind} is empty or contains invalid characters: {name!r}")
     return name
 
 uc_catalog       = _validate_id(dbutils.widgets.get("uc_catalog"), "catalog")

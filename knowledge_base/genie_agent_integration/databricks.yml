@@ -56,13 +56,14 @@ variables:
     description: UC schema for the registered UC function
     default: "genie_tools"
 
-workspace:
-  host: https://myworkspace.databricks.com
-
 targets:
   dev:
     default: true
     mode: development
+    workspace:
+      host: https://myworkspace.databricks.com
   prod:
+    workspace:
+      host: https://myworkspace.databricks.com
     run_as:
       service_principal_name: genie-agent-svc

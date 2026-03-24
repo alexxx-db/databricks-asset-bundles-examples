@@ -56,18 +56,19 @@ variables:
     description: Databricks App name (must be globally unique in your workspace)
     default: "genify-${bundle.target}"
 
-workspace:
-  host: https://myworkspace.databricks.com
-
 targets:
   dev:
     default: true
     mode: development
+    workspace:
+      host: https://myworkspace.databricks.com
     variables:
       llm_endpoint: "databricks-meta-llama-3-3-70b-instruct"   # cheaper for dev
       lakebase_enabled: "false"
 
   prod:
+    workspace:
+      host: https://myworkspace.databricks.com
     run_as:
       service_principal_name: genify-app-svc
     variables:

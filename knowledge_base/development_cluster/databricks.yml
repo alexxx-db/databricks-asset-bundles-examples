@@ -4,13 +4,12 @@ bundle:
 include:
   - resources/*.yml
 
-workspace:
-  host: https://myworkspace.cloud.databricks.com
-
 targets:
   dev:
     mode: development
     default: true
+    workspace:
+      host: https://myworkspace.cloud.databricks.com
 
     # By configuring this field for the "dev" target, all jobs in this bundle
     # are overridden to use the all-purpose cluster defined below.
@@ -36,6 +35,6 @@ targets:
           custom_tags:
               "ResourceClass": "SingleNode"
 
-  prod: {
-    # No overrides
-  }
+  prod:
+    workspace:
+      host: https://myworkspace.cloud.databricks.com

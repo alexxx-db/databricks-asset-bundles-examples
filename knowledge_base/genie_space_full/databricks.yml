@@ -69,18 +69,19 @@ variables:
   manage_groups:
     default: "data-platform"
 
-workspace:
-  host: https://myworkspace.databricks.com
-
 targets:
   dev:
     default: true
     mode: development
+    workspace:
+      host: https://myworkspace.databricks.com
     variables:
       space_title: "FinOps Explorer (dev)"
       uc_catalog: "example_catalog_dev"
 
   prod:
+    workspace:
+      host: https://myworkspace.databricks.com
     run_as:
       service_principal_name: genie-deploy-svc
     variables:

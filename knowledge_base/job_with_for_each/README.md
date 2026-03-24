@@ -1,74 +1,27 @@
-# job_with_for_each
+# Job with For Each Task
 
-This example demonstrates a simple Databricks job that uses a foreach task.
+Demonstrates using a Databricks job `for_each` task to run another task in a loop over dynamically generated items.
 
-* `src/`: Python source code for this project.
-    * `foreach/generate_items.py`: A notebook which returns a list of items to be used for task generation.
-    * `foreach/process_item.py`: A notebook which will process an item.
-* `resources/`:  Resource configurations (jobs, pipelines, etc.)
+## Prerequisites
+
+- [Databricks CLI](https://docs.databricks.com/dev-tools/cli/install.html) v0.218.0+
+
+## How it works
+
+- `src/foreach/generate_items.py` — Notebook that returns a JSON list of items.
+- `src/foreach/process_item.py` — Notebook that processes a single item from the list.
+- `resources/for_each_task_example.job.yml` — Job definition with a `for_each` task that iterates over the generated items.
+
+## Usage
+
+1. Update the `workspace.host` in `databricks.yml` to your workspace URL.
+
+2. Deploy and run:
+   ```
+   databricks bundle deploy --target dev
+   databricks bundle run for_each_task_example
+   ```
 
 ## Documentation
 
-For more information about for each tasks, see:
 - [Use a For each task to run another task in a loop](https://docs.databricks.com/aws/en/jobs/for-each)
-
-## Getting started
-
-Choose how you want to work on this project:
-
-(a) Directly in your Databricks workspace, see
-    https://docs.databricks.com/dev-tools/bundles/workspace.
-
-(b) Locally with an IDE like Cursor or VS Code, see
-    https://docs.databricks.com/vscode-ext.
-
-(c) With command line tools, see https://docs.databricks.com/dev-tools/cli/databricks-cli.html
-
-If you're developing with an IDE, dependencies for this project should be installed using uv:
-
-*  Make sure you have the UV package manager installed.
-   It's an alternative to tools like pip: https://docs.astral.sh/uv/getting-started/installation/.
-*  Run `uv sync --dev` to install the project's dependencies.
-
-
-# Using this project using the CLI
-
-The Databricks workspace and IDE extensions provide a graphical interface for working
-with this project. It's also possible to interact with it directly using the CLI:
-
-1. Authenticate to your Databricks workspace, if you have not done so already:
-    ```
-    $ databricks configure
-    ```
-
-2. To deploy a development copy of this project, type:
-    ```
-    $ databricks bundle deploy --target dev
-    ```
-    (Note that "dev" is the default target, so the `--target` parameter
-    is optional here.)
-
-    This deploys everything that's defined for this project.
-    For example, the default template would deploy a job called
-    `[dev yourname] for_each_task_example` to your workspace.
-    You can find that resource by opening your workspace and clicking on **Jobs & Pipelines**.
-
-3. Similarly, to deploy a production copy, type:
-   ```
-   $ databricks bundle deploy --target prod
-   ```
-   Note that the default job from the template has a schedule that runs every day
-   (defined in resources/sample_job.job.yml). The schedule
-   is paused when deploying in development mode (see
-   https://docs.databricks.com/dev-tools/bundles/deployment-modes.html).
-
-4. To run a job or pipeline, use the "run" command:
-   ```
-   $ databricks bundle run
-   ```
-
-5. Finally, to run tests locally, use `pytest`:
-   ```
-   $ uv run pytest
-   ```
-

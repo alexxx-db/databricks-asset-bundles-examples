@@ -1,6 +1,0 @@
-# Note: this file only excludes root level entries.
-# Subdirectories must use their own .gitignore file to make sure
-# that they are complete and can be used outside this repository.
-
-/.ruff_cache
-/.vscode

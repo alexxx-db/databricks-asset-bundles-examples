@@ -11,10 +11,9 @@ variables:
       # Replace this with the name of your SQL warehouse.
       warehouse: "Shared Unity Catalog Serverless"
 
-workspace:
-  host: https://myworkspace.databricks.com
-
 targets:
   dev:
     default: true
     mode: development
+    workspace:
+      host: https://myworkspace.databricks.com

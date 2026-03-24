@@ -1,12 +1,10 @@
-# Ruff configuration — consolidates settings from pyproject.toml plus formatter config.
-# This file takes precedence over pyproject.toml for ruff, so ALL settings must be here.
+# Ruff configuration for the repo. This file takes precedence over pyproject.toml.
 
 target-version = "py311"
 line-length = 120
 exclude = [
     ".git",
     "contrib/templates",
-    "scripts/contrib/templates",
     ".venv",
     "venv",
 ]
@@ -15,9 +13,8 @@ exclude = [
 # invalid Python syntax. Ruff cannot parse them, producing cascading false
 # positives. To regenerate this list: python scripts/generate_ruff_notebook_excludes.py
 extend-exclude = [
-    # -- contrib notebooks --
     "contrib/job_with_ai_parse_document/src",
-    # -- knowledge_base notebooks --
+    "default_minimal/src",
     "knowledge_base/development_cluster/src",
     "knowledge_base/genie_agent_integration/src",
     "knowledge_base/genie_metadata_generator/notebooks",
@@ -30,29 +27,9 @@ extend-exclude = [
     "knowledge_base/job_with_for_each/src",
     "knowledge_base/job_with_task_values/src",
     "knowledge_base/target_includes/src",
-    # -- template-generated notebooks --
-    "default_minimal/src",
     "mlops_stacks/mlops_stacks/deployment",
     "mlops_stacks/mlops_stacks/training",
     "mlops_stacks/mlops_stacks/validation",
-    # -- scripts/ mirrors of above --
-    "scripts/contrib/job_with_ai_parse_document/src",
-    "scripts/default_minimal/src",
-    "scripts/knowledge_base/development_cluster/src",
-    "scripts/knowledge_base/genie_agent_integration/src",
-    "scripts/knowledge_base/genie_metadata_generator/notebooks",
-    "scripts/knowledge_base/genie_space/src",
-    "scripts/knowledge_base/genie_space_full/src",
-    "scripts/knowledge_base/iceberg_catalog/notebooks",
-    "scripts/knowledge_base/job_conditional_execution/src",
-    "scripts/knowledge_base/job_file_arrival/src",
-    "scripts/knowledge_base/job_table_update_trigger/src",
-    "scripts/knowledge_base/job_with_for_each/src",
-    "scripts/knowledge_base/job_with_task_values/src",
-    "scripts/knowledge_base/target_includes/src",
-    "scripts/mlops_stacks/mlops_stacks/deployment",
-    "scripts/mlops_stacks/mlops_stacks/training",
-    "scripts/mlops_stacks/mlops_stacks/validation",
 ]
 
 [format]
@@ -80,8 +57,7 @@ ignore = [
 ]
 
 [lint.per-file-ignores]
-# Databricks .ipynb notebooks — cells use spark/dbutils globals and have
-# imports scattered across cells.
+# Databricks .ipynb notebooks — cells use spark/dbutils globals.
 "*.ipynb" = ["F821", "E402"]
 # Non-notebook .py files that use Databricks runtime globals (spark, dbutils).
 "**/transformations/*.py" = ["F821", "E402"]

@@ -25,7 +25,7 @@ jobs:
       - name: Install ruff
         run: pip install ruff
       - name: Run ruff
-        run: ruff check knowledge_base/genie_metadata_generator/app/ contrib/data_engineering/
+        run: ruff check .
 
   pyright:
     runs-on: ubuntu-latest
@@ -58,7 +58,7 @@ jobs:
       - name: Install PyYAML
         run: pip install pyyaml
       - name: Validate bundle schema
-        run: python scripts/validate_bundle_schema.py
+        run: python scripts/discover_bundle_dirs.py --validate
 
   # NEW: Validates Databricks Asset Bundle syntax across all examples
   bundle-validate:
